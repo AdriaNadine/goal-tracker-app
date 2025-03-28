@@ -1,0 +1,14 @@
+version: 1.0
+
+workflows:
+  default:
+    name: Default Workflow
+    actions:
+      - name: Install Pods
+        script: |
+          cd ios
+          pod install
+      - name: Build App
+        build:
+          scheme: GoalTracker
+          destination: "generic/platform=iOS"
