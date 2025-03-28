@@ -26,7 +26,7 @@
       "supportsTablet": true,
       "newArchEnabled": true,
       "bundleIdentifier": "com.adriaross.goaltracker",
-      "buildNumber": "2.0.0",
+      "buildNumber": "2.0.1",
       "icon": "./assets/icon.png",
       "splash": {
         "image": "./assets/splash.png",

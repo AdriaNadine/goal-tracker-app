@@ -1,27 +1,41 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { getAuth } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 
 const AuthGateScreen = () => {
   const navigation = useNavigation();
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const auth = getAuth();
-    const user = auth.currentUser;
+    if (!navigation) return;
 
-    if (user) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'MainTabs' }],
-      });
-    } else {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'SignIn' }],
-      });
-    }
+    const auth = getAuth();
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainTabs' }],
+        });
+      } else {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'SignIn' }],
+        });
+      }
+      setCheckingAuth(false);
+    });
+
+    return unsubscribe;
   }, []);
+
+  if (checkingAuth) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
