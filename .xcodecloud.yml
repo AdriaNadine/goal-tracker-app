@@ -1,14 +1,15 @@
 version: 1.0
-
 workflows:
   default:
     name: Default Workflow
     actions:
-      - name: Install Pods
+      - name: Install CocoaPods
         script: |
           cd ios
+          rm -rf Pods
           pod install
       - name: Build App
         build:
+          workspace: ios/GoalTracker.xcworkspace
           scheme: GoalTracker
           destination: "generic/platform=iOS"
