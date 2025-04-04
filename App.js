@@ -11,6 +11,8 @@ import usePremiumStatus from './hooks/usePremiumStatus';
 import Constants from 'expo-constants';
 import { db } from './config/firebase';
 import { collection, getDocs } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './config/firebase';
 
 const PRODUCT_ID = 'goal_master_unlock';
 
@@ -25,6 +27,18 @@ export default function App() {
     Constants?.manifest2?.extra?.expoClient?.version ||
     Constants?.manifest?.version ||
     'Unknown';
+  
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser || null);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const testFirestore = async () => {
@@ -46,6 +60,10 @@ export default function App() {
   //   requestNotificationPermissions();
   // }, []);
 
+  if (loading) {
+    return null;
+  }
+
   return (
     <NavigationContainer>
       <Text style={{
@@ -59,7 +77,7 @@ export default function App() {
       }}>
         BUILD: development | VERSION: {version} | USER: {isPremium ? 'Premium ✅' : 'Free ❌'}
       </Text>
-      <AppNavigator />
+      <AppNavigator user={user} />
     </NavigationContainer>
   );
 }
