@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
-import * as InAppPurchases from 'expo-in-app-purchases';
+// import * as InAppPurchases from 'expo-in-app-purchases';
+// import { fetchProducts, purchaseItemAsync } from './utils/iap';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -9,88 +10,10 @@ import AppNavigator from './AppNavigator';
 import usePremiumStatus from './hooks/usePremiumStatus';
 import Constants from 'expo-constants';
 
-import { fetchProducts, purchaseItemAsync } from './utils/iap';
-import { db } from './config/firebase';
-import { collection, getDocs } from 'firebase/firestore';
-
 const PRODUCT_ID = 'goal_master_unlock';
 
 function PremiumScreen() {
-  const [product, setProduct] = useState(null);
-  const [hasPremium, setHasPremium] = useState(false);
-
-  const requestNotificationPermission = async () => {
-    const { status } = await Notifications.getPermissionsAsync();
-    if (status !== 'granted') {
-      const { status: newStatus } = await Notifications.requestPermissionsAsync();
-      if (newStatus !== 'granted') {
-        console.warn('Notifications permission not granted');
-      }
-    }
-  };
-
-  const fetchProductDetails = async () => {
-    try {
-      const products = await fetchProducts([PRODUCT_ID]);
-      if (products && products.length > 0) {
-        setProduct(products[0]);
-      } else {
-        console.warn('No products found');
-      }
-    } catch (error) {
-      console.error('Error fetching products', error);
-    }
-  };
-
-  const handleBuy = async () => {
-    try {
-      if (product && product.productId) {
-        await purchaseItemAsync(product.productId);
-        Alert.alert('Success', 'Purchase completed successfully!');
-        setHasPremium(true);
-        await AsyncStorage.setItem('hasPremium', 'true');
-      } else {
-        Alert.alert('Error', 'Product not available for purchase.');
-      }
-    } catch (error) {
-      console.error('Purchase failed', error);
-      Alert.alert('Purchase error', 'An error occurred while trying to buy the product.');
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      const checkPremium = async () => {
-        const value = await AsyncStorage.getItem('hasPremium');
-        setHasPremium(value === 'true');
-      };
-      checkPremium();
-    }, [])
-  );
-
-  useEffect(() => {
-    requestNotificationPermission(); // ✅ Request permissions when app loads
-    fetchProductDetails(); // ✅ Fetch product details when app loads
-  }, []);
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Goal Master Upgrade</Text>
-      <Text style={styles.description}>
-        Unlock unlimited goals, save your reflections, and personalize your dashboard!
-      </Text>
-      {hasPremium ? (
-        <Text style={styles.success}>✅ You already own Goal Master</Text>
-      ) : (
-        <>
-          <Text style={styles.description}>
-            {product ? `Price: ${product.price}` : 'Loading product details...'}
-          </Text>
-          <Button title="Buy Goal Master" onPress={handleBuy} disabled={!product} />
-        </>
-      )}
-    </View>
-  );
+  return null;
 }
 
 export default function App() {
