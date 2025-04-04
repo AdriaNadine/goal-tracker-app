@@ -10,6 +10,8 @@ import usePremiumStatus from './hooks/usePremiumStatus';
 import Constants from 'expo-constants';
 
 import { fetchProducts, purchaseItemAsync } from './utils/iap';
+import { db } from './config/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 const PRODUCT_ID = 'goal_master_unlock';
 
@@ -98,6 +100,18 @@ export default function App() {
     Constants?.manifest2?.extra?.expoClient?.version ||
     Constants?.manifest?.version ||
     'Unknown';
+
+  useEffect(() => {
+    const testFirestore = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'categories'));
+        console.log(`✅ Firebase is connected! Found ${snapshot.size} categories.`);
+      } catch (error) {
+        console.error('❌ Firebase test read failed:', error.message);
+      }
+    };
+    testFirestore();
+  }, []);
 
   return (
     <NavigationContainer>
