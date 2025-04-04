@@ -9,6 +9,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './AppNavigator';
 import usePremiumStatus from './hooks/usePremiumStatus';
 import Constants from 'expo-constants';
+import { db } from './config/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 const PRODUCT_ID = 'goal_master_unlock';
 
