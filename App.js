@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
 // import * as InAppPurchases from 'expo-in-app-purchases';
 // import { fetchProducts, purchaseItemAsync } from './utils/iap';
-import * as Notifications from 'expo-notifications';
+// import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -37,6 +37,14 @@ export default function App() {
     };
     testFirestore();
   }, []);
+
+  // useEffect(() => {
+  //   const requestNotificationPermissions = async () => {
+  //     const { status } = await Notifications.getPermissionsAsync();
+  //     // Additional logic for handling notification permissions
+  //   };
+  //   requestNotificationPermissions();
+  // }, []);
 
   return (
     <NavigationContainer>
