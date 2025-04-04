@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { app } from './config/firebase';
 
 // Screens
 import WelcomeScreen from './screens/WelcomeScreen';
@@ -31,24 +29,7 @@ function MainTabs() {
   );
 }
 
-export default function AppNavigator() {
-  const [user, setUser] = useState(null);
-  const [authLoading, setAuthLoading] = useState(true);
-
-  useEffect(() => {
-    const auth = getAuth(app);
-    const unsubscribe = onAuthStateChanged(auth, currentUser => {
-      setUser(currentUser);
-      setAuthLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  if (authLoading) {
-    return null; // You could return a loading spinner here
-  }
-
+export default function AppNavigator({ user }) {
   return (
     <Stack.Navigator initialRouteName={user ? 'MainTabs' : 'Welcome'}>
       {!user ? (
