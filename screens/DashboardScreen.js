@@ -57,14 +57,19 @@ const DashboardScreen = () => {
         setUserEmail(user.email || 'No email available');
         fetchData();
       } else {
-        console.log("🚫 No user found. Redirecting to SignIn.");
-        setUserEmail('');
-        setGoals([]);
-        setSteps([]);
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'SignIn' }],
-        });
+        const currentRoute = navigation.getState().routes[navigation.getState().index].name;
+        if (currentRoute !== 'SignIn') {
+          console.log("🚫 No user found. Redirecting to SignIn.");
+          setUserEmail('');
+          setGoals([]);
+          setSteps([]);
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'SignIn' }],
+          });
+        } else {
+          console.log("🚫 No user found, already on SignIn screen.");
+        }
       }
     });
  

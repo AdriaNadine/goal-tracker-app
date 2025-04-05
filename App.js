@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
 // import * as InAppPurchases from 'expo-in-app-purchases';
 // import { fetchProducts, purchaseItemAsync } from './utils/iap';
@@ -51,8 +51,11 @@ export default function App() {
         console.error('❌ Firebase test read failed:', error.message);
       }
     };
-    testFirestore();
-  }, []);
+
+    if (user) {
+      testFirestore();
+    }
+  }, [user]);
 
   // useEffect(() => {
   //   const requestNotificationPermissions = async () => {
