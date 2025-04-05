@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // Screens
 import WelcomeScreen from './screens/WelcomeScreen';
 import InstructionScreen from './screens/InstructionScreen';
-import AuthGateScreen from './screens/AuthGateScreen';
+import SignInScreen from './screens/SignInScreen';
 import GuidedMeditationScreen from './screens/GuidedMeditationScreen';
 import CategoriesScreen from './screens/CategoriesScreen';
 import GoalQuestionsScreen from './screens/GoalQuestionsScreen';
@@ -13,7 +13,6 @@ import GoalBreakdownScreen from './screens/GoalBreakdownScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import ProgressScreen from './screens/ProgressScreen';
 import PremiumScreen from './screens/PremiumScreen';
-import SignInScreen from './screens/SignInScreen';
 import SignUpScreen from './screens/SignUpScreen';
 
 const Stack = createNativeStackNavigator();
@@ -31,12 +30,14 @@ function MainTabs() {
 
 export default function AppNavigator({ user }) {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName={user ? 'MainTabs' : 'Welcome'}
+    >
       {!user ? (
         <>
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="Instruction" component={InstructionScreen} />
-          <Stack.Screen name="AuthGate" component={AuthGateScreen} />
           <Stack.Screen name="SignIn" component={SignInScreen} />
           <Stack.Screen name="SignUp" component={SignUpScreen} />
         </>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import usePremiumStatus from '../hooks/usePremiumStatus';
 
@@ -51,31 +51,12 @@ const DashboardScreen = () => {
   useEffect(() => {
     console.log("Using Firebase Project ID:", process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID);
  
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("✅ Authenticated user detected:", user.email);
-        setUserEmail(user.email || 'No email available');
-        fetchData();
-      } else {
-        const currentRoute = navigation.getState().routes[navigation.getState().index].name;
-        if (currentRoute !== 'SignIn') {
-          console.log("🚫 No user found. Redirecting to SignIn.");
-          setUserEmail('');
-          setGoals([]);
-          setSteps([]);
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'SignIn' }],
-          });
-        } else {
-          console.log("🚫 No user found, already on SignIn screen.");
-        }
-      }
-    });
- 
+    if (auth.currentUser) {
+      setUserEmail(auth.currentUser.email || 'No email available');
+      fetchData();
+    }
+
     setQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
- 
-    return () => unsubscribe();
   }, [navigation]);
 
   useFocusEffect(

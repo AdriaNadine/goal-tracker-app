@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, TextInput } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 
 const GoalBreakdownScreen = () => {
   const navigation = useNavigation();
@@ -122,11 +122,13 @@ const GoalBreakdownScreen = () => {
     [newSteps[index], newSteps[targetIndex]] = [newSteps[targetIndex], newSteps[index]];
     newSteps.forEach((step, idx) => (step.order = idx));
 
+    const batch = writeBatch(db);
     try {
       for (const step of newSteps) {
         const stepRef = doc(db, 'steps', step.id);
-        await updateDoc(stepRef, { order: step.order });
+        batch.update(stepRef, { order: step.order });
       }
+      await batch.commit();
       setSteps(newSteps);
     } catch (error) {
       console.error('Error updating step order:', error);
@@ -139,6 +141,7 @@ const GoalBreakdownScreen = () => {
       Alert.alert('Error', 'Please add at least one step.');
       return;
     }
+    Alert.alert('Success', 'Your steps have been saved!');
     navigation.navigate('Tabs', { screen: 'Progress' });
   };
 
@@ -217,6 +220,7 @@ const GoalBreakdownScreen = () => {
         </View>
       )}
 
+      // TODO: Consider validating or parsing the deadline input to ensure it's a valid date format (e.g., with a date picker or regex check)
       <Text style={styles.label} allowFontScaling={true}>Deadline (e.g., YYYY-MM-DD):</Text>
       <TextInput
         style={styles.input}

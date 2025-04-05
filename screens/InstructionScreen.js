@@ -20,7 +20,7 @@ const InstructionScreen = () => {
       </Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('AuthGate')}
+        onPress={() => navigation.navigate('SignIn')}
       >
         <Text style={styles.buttonText} allowFontScaling={true}>Proceed to Sign In</Text>
       </TouchableOpacity>

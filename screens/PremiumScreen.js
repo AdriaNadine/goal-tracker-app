@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
 import * as InAppPurchases from 'expo-in-app-purchases';
+import { setPurchaseListener, unlockPremium } from '../utils/iap';
 import * as Notifications from 'expo-notifications'; // ✅ NEW: Import notifications
 
 const PRODUCT_ID = 'goal_master_unlock'; // Must match App Store Connect
@@ -35,20 +36,9 @@ export default function PremiumScreen() {
       }
     };
 
-    const purchaseListener = InAppPurchases.setPurchaseListener(({ responseCode, results, errorCode }) => {
-      if (responseCode === InAppPurchases.IAPResponseCode.OK) {
-        results.forEach(async (purchase) => {
-          if (!purchase.acknowledged) {
-            Alert.alert("Thank you!", "Your purchase was successful. 🥳");
-            await InAppPurchases.finishTransactionAsync(purchase, true);
-            // TODO: unlock premium access in app state here
-          }
-        });
-      } else if (responseCode === InAppPurchases.IAPResponseCode.USER_CANCELED) {
-        Alert.alert("Purchase canceled");
-      } else {
-        Alert.alert("Purchase error", errorCode?.toString());
-      }
+    setPurchaseListener(async () => {
+      Alert.alert("Thank you!", "Your purchase was successful. 🥳");
+      await unlockPremium();
     });
 
     fetchProducts();

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Share } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Share, Alert } from 'react-native';
 import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import XPConfetti from '../utils/xp';
 import ConfettiCannon from 'react-native-confetti-cannon';
 
 const ProgressScreen = () => {
@@ -14,6 +15,7 @@ const ProgressScreen = () => {
   const [sortType, setSortType] = useState('default');
   const [error, setError] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [currentXP, setCurrentXP] = useState(0);
 
   const fetchData = async () => {
     if (!auth.currentUser) {
@@ -52,6 +54,14 @@ const ProgressScreen = () => {
   useEffect(() => {
     fetchData();
   }, [navigation]);
+  
+  useEffect(() => {
+    const loadXP = async () => {
+      const storedXP = await AsyncStorage.getItem('userXP');
+      setCurrentXP(storedXP ? parseInt(storedXP, 10) : 0);
+    };
+    loadXP();
+  }, [steps]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -59,6 +69,7 @@ const ProgressScreen = () => {
     }, [])
   );
 
+  // TODO: Consider moving XP tracking to Firestore instead of AsyncStorage to support cross-device sync
   const toggleStepCompletion = async (stepId, currentStatus) => {
     try {
       const stepRef = doc(db, 'steps', stepId);
@@ -77,7 +88,9 @@ const ProgressScreen = () => {
           const storedXP = await AsyncStorage.getItem('userXP');
           let xp = storedXP ? parseInt(storedXP, 10) : 0;
           xp += 10;
+          // TODO: Consider syncing XP to Firestore for cross-device tracking and persistence
           await AsyncStorage.setItem('userXP', xp.toString());
+          Alert.alert('Step Completed', `You earned 10 XP! Total XP: ${xp}`);
 
           if (xp % 100 === 0) {
             setShowConfetti(true);
@@ -136,6 +149,7 @@ const ProgressScreen = () => {
     });
 
     if (sortType === 'priority') {
+      // TODO: Consider giving users the ability to edit step priority or deadline directly from this view
       return combined.map(goal => ({
         ...goal,
         steps: [...goal.steps].sort((a, b) => getPriorityValue(b.urgency) - getPriorityValue(a.urgency)),
@@ -183,6 +197,7 @@ const ProgressScreen = () => {
                   </Text>
                 </TouchableOpacity>
               </View>
+              // TODO: Consider allowing users to tap and view full goal reflections: why, where, who, when
               <Text allowFontScaling={true} style={[styles.stepDetail, { color: step.completed ? '#888' : '#666' }]}>
                 Priority: {step.urgency} | Deadline: {step.deadline ? new Date(step.deadline).toLocaleDateString() : 'No deadline'} | Completed: {step.completed ? 'Yes' : 'No'}
               </Text>
@@ -226,6 +241,7 @@ const ProgressScreen = () => {
         renderItem={renderItem}
         ListEmptyComponent={<Text allowFontScaling={true} style={styles.emptyText}>No goals or steps yet.</Text>}
       />
+      <XPConfetti currentXP={currentXP} />
       <TouchableOpacity
         style={styles.navButton}
         onPress={() => navigation.navigate('Dashboard')}

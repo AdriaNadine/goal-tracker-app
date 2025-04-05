@@ -116,6 +116,9 @@ const GuidedMeditationScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header} allowFontScaling={true}>Guided Meditation</Text>
+      <TouchableOpacity style={styles.skipButton} onPress={handleProceed}>
+        <Text style={styles.skipText}>Skip Meditation</Text>
+      </TouchableOpacity>
       <Text style={styles.prompt} allowFontScaling={true}>{meditationSteps[currentStep].prompt}</Text>
       <View style={styles.controls}>
         <TouchableOpacity style={styles.controlButton} onPress={handlePauseResume}>
@@ -180,6 +183,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  skipButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    backgroundColor: 'transparent',
+    padding: 10,
+  },
+  skipText: {
+    color: '#007AFF',
+    fontWeight: '600',
+    fontSize: 14,
   },
 });
 

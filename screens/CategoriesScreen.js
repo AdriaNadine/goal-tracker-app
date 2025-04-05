@@ -27,6 +27,7 @@ const CategoriesScreen = () => {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryColor, setNewCategoryColor] = useState('#000000');
   const [showPicker, setShowPicker] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -38,6 +39,7 @@ const CategoriesScreen = () => {
       return;
     }
 
+    setLoading(true);
     try {
       const q = query(
         collection(db, 'categories'),
@@ -52,6 +54,8 @@ const CategoriesScreen = () => {
     } catch (error) {
       console.error('Error fetching categories:', error);
       Alert.alert('Error', 'Failed to fetch categories.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -179,14 +183,18 @@ const CategoriesScreen = () => {
       <TouchableOpacity style={styles.addButton} onPress={addCategory}>
         <Text style={styles.addButtonText}>Add Category</Text>
       </TouchableOpacity>
-      <FlatList
-        data={categories}
-        keyExtractor={(item) => item.id}
-        renderItem={renderCategory}
-        contentContainerStyle={styles.listContent}
-        style={styles.list}
-        ListEmptyComponent={<Text style={styles.emptyText}>No categories yet.</Text>}
-      />
+      {loading ? (
+        <Text style={{ textAlign: 'center', marginVertical: 20 }}>Loading categories...</Text>
+      ) : (
+        <FlatList
+          data={categories}
+          keyExtractor={(item) => item.id}
+          renderItem={renderCategory}
+          contentContainerStyle={styles.listContent}
+          style={styles.list}
+          ListEmptyComponent={<Text style={styles.emptyText}>No categories yet.</Text>}
+        />
+      )}
       <Text style={styles.sectionTitle}>Goal Templates</Text>
       <FlatList
         data={goalTemplates}

@@ -1,10 +1,18 @@
+import React, { useEffect, useState } from 'react';
 import ConfettiCannon from 'react-native-confetti-cannon';
 
-const [showConfetti, setShowConfetti] = useState(false);
+const XPConfetti = ({ currentXP }) => {
+  const [showConfetti, setShowConfetti] = useState(false);
 
-if (currentXP > 0 && currentXP % 100 === 0) {
-  setShowConfetti(true);
-  setTimeout(() => setShowConfetti(false), 4000);
-}
+  useEffect(() => {
+    if (currentXP > 0 && currentXP % 100 === 0) {
+      setShowConfetti(true);
+      const timer = setTimeout(() => setShowConfetti(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentXP]);
 
-{showConfetti && <ConfettiCannon count={80} origin={{x: -10, y: 0}} />}
+  return showConfetti ? <ConfettiCannon count={80} origin={{ x: -10, y: 0 }} /> : null;
+};
+
+export default XPConfetti;
