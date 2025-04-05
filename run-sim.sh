@@ -1,4 +1,4 @@
 #!/bin/bash
 
-echo "🚀 Launching iOS simulator with clean build cache..."
+echo "🚀 Launching iOS simulator"
 npx expo run:ios
