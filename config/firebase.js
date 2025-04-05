@@ -8,17 +8,21 @@ import {
   EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID
 } from '@env';
 
-// Import Firebase SDKs
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import {
+  getAuth,
+  initializeAuth,
+  getReactNativePersistence,
+  onAuthStateChanged,
+} from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 
-// Debugging: Check if environment variables are loading
+// Log environment values for debugging
 console.log("Firebase API Key:", EXPO_PUBLIC_FIREBASE_API_KEY);
 console.log("Firebase Project ID:", EXPO_PUBLIC_FIREBASE_PROJECT_ID);
 
-// Firebase Configuration
+// Firebase config
 const firebaseConfig = {
   apiKey: EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -29,18 +33,44 @@ const firebaseConfig = {
   measurementId: EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
+// Initialize Firebase app
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
+
+// Initialize Firebase Auth (with persistence guard)
+let auth;
+try {
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage),
+  });
+} catch (e) {
+  if (e.code === "auth/already-initialized") {
+    auth = getAuth(app);
+  } else {
+    throw e;
+  }
+}
+
+// Check auth state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("✅ Firebase user is signed in:", user.email);
+  } else {
+    console.log("❌ No Firebase user is signed in.");
+  }
 });
+
+// Initialize Firestore
 const db = getFirestore(app);
 
-// Handle Firebase Analytics only in supported environments
+// Lazy load Firebase Analytics in supported environments only
 let analytics;
 if (typeof window !== "undefined") {
-  import("firebase/analytics").then(({ getAnalytics }) => {
-    analytics = getAnalytics(app);
+  import("firebase/analytics").then(({ getAnalytics, isSupported }) => {
+    isSupported().then((ok) => {
+      if (ok) {
+        analytics = getAnalytics(app);
+      }
+    });
   });
 }
 

@@ -31,18 +31,18 @@ function MainTabs() {
 
 export default function AppNavigator({ user }) {
   return (
-    <Stack.Navigator initialRouteName={user ? 'MainTabs' : 'Welcome'}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!user ? (
         <>
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="Instruction" component={InstructionScreen} />
-          <Stack.Screen name="AuthGate" component={AuthGateScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="AuthGate" component={AuthGateScreen} />
           <Stack.Screen name="SignIn" component={SignInScreen} />
           <Stack.Screen name="SignUp" component={SignUpScreen} />
         </>
       ) : (
         <>
-          <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
+          <Stack.Screen name="MainTabs" component={MainTabs} />
           <Stack.Screen name="Meditation" component={GuidedMeditationScreen} />
           <Stack.Screen name="Categories" component={CategoriesScreen} />
           <Stack.Screen name="GoalQuestions" component={GoalQuestionsScreen} />

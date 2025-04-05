@@ -32,6 +32,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("📦 iOS Firebase Config:", Constants.expoConfig?.ios?.config);
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser || null);
       setLoading(false);

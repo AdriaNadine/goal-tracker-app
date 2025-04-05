@@ -6,9 +6,7 @@ export default {
     icon: "./assets/icon.png",
     ios: {
       bundleIdentifier: "com.adriaross.goaltracker",
-      config: {
-        googleServicesFile: "./assets/ios/GoogleService-Info.plist"
-      },
+      googleServicesFile: process.env.GOOGLE_SERVICES_PLIST || "./assets/ios/GoogleService-Info.plist",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false
       }

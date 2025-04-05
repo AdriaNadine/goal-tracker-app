@@ -50,24 +50,34 @@ const DashboardScreen = () => {
 
   useEffect(() => {
     console.log("Using Firebase Project ID:", process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID);
-
+ 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log("✅ Authenticated user detected:", user.email);
         setUserEmail(user.email || 'No email available');
         fetchData();
       } else {
-        navigation.navigate('SignIn');
+        console.log("🚫 No user found. Redirecting to SignIn.");
+        setUserEmail('');
+        setGoals([]);
+        setSteps([]);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'SignIn' }],
+        });
       }
     });
-
+ 
     setQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
-
+ 
     return () => unsubscribe();
   }, [navigation]);
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchData();
+      if (auth.currentUser) {
+        fetchData();
+      }
       setQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
     }, [])
   );
@@ -75,9 +85,17 @@ const DashboardScreen = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigation.navigate('SignIn');
+      console.log("✅ User successfully signed out.");
+      setUserEmail('');
+      setGoals([]);
+      setSteps([]);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'SignIn' }],
+      });
     } catch (error) {
       console.error('Logout error:', error);
+      Alert.alert('Error', 'Failed to log out.');
     }
   };
 
