@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import app from '../config/firebase';
+import { Text } from 'react-native'; // Import Text component
 
 const usePremiumStatus = () => {
   const [isPremium, setIsPremium] = useState(false);

@@ -17,10 +17,11 @@ import {
 } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
+import { Text } from 'react-native'; // Import Text component
 
 // Log environment values for debugging
-console.log("Firebase API Key:", EXPO_PUBLIC_FIREBASE_API_KEY);
-console.log("Firebase Project ID:", EXPO_PUBLIC_FIREBASE_PROJECT_ID);
+console.log(<Text>Firebase API Key: {EXPO_PUBLIC_FIREBASE_API_KEY}</Text>);
+console.log(<Text>Firebase Project ID: {EXPO_PUBLIC_FIREBASE_PROJECT_ID}</Text>);
 
 // Firebase config
 const firebaseConfig = {
@@ -53,9 +54,9 @@ try {
 // Check auth state
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    console.log("✅ Firebase user is signed in:", user.email);
+    console.log(<Text>✅ Firebase user is signed in: {user.email}</Text>);
   } else {
-    console.log("❌ No Firebase user is signed in.");
+    console.log(<Text>❌ No Firebase user is signed in.</Text>);
   }
 });
 

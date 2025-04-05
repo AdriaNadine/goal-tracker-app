@@ -47,7 +47,7 @@ const ProgressScreen = () => {
       setSteps(userSteps);
     } catch (error) {
       console.error('Error fetching data:', error);
-      setError(error.message);
+      setError(<Text>{error.message}</Text>);
     }
   };
 
@@ -90,7 +90,7 @@ const ProgressScreen = () => {
           xp += 10;
           // TODO: Consider syncing XP to Firestore for cross-device tracking and persistence
           await AsyncStorage.setItem('userXP', xp.toString());
-          Alert.alert('Step Completed', `You earned 10 XP! Total XP: ${xp}`);
+          Alert.alert('Step Completed', <Text>You earned 10 XP! Total XP: {xp}</Text>);
 
           if (xp % 100 === 0) {
             setShowConfetti(true);
@@ -102,7 +102,7 @@ const ProgressScreen = () => {
       }
     } catch (error) {
       console.error('Error updating step completion:', error);
-      setError(error.message);
+      setError(<Text>{error.message}</Text>);
     }
   };
 
@@ -110,7 +110,7 @@ const ProgressScreen = () => {
     const completedSteps = steps.filter(step => step.categoryColor === goal.categoryColor && step.completed).length;
     const totalSteps = steps.filter(step => step.categoryColor === goal.categoryColor).length;
     const progress = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
-    const message = `I'm ${progress}% done with my goal: "${goal.answers.what}" in ${goal.categoryName}!`;
+    const message = <Text>I'm {progress}% done with my goal: "{goal.answers.what}" in {goal.categoryName}!</Text>;
 
     try {
       await Share.share({
@@ -118,7 +118,7 @@ const ProgressScreen = () => {
       });
     } catch (error) {
       console.error('Error sharing goal:', error);
-      setError(error.message);
+      setError(<Text>{error.message}</Text>);
     }
   };
 
@@ -149,7 +149,6 @@ const ProgressScreen = () => {
     });
 
     if (sortType === 'priority') {
-      // TODO: Consider giving users the ability to edit step priority or deadline directly from this view
       return combined.map(goal => ({
         ...goal,
         steps: [...goal.steps].sort((a, b) => getPriorityValue(b.urgency) - getPriorityValue(a.urgency)),
