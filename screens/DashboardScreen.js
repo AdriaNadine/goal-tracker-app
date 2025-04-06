@@ -133,7 +133,7 @@ const DashboardScreen = () => {
       );
       return;
     }
-    navigation.navigate('Progress', { categoryFilter: categoryName });
+    navigation.navigate('Categories');  // Updated navigation to Categories tab
   };
 
   const getCategorySummary = () => {

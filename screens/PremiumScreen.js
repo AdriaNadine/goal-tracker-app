@@ -25,28 +25,29 @@ export default function PremiumScreen() {
   useEffect(() => {
     requestNotificationPermission(); // ✅ NEW: Ask for permissions on load
 
-    const fetchProducts = async () => {
-      const { responseCode, results } = await InAppPurchases.getProductsAsync([PRODUCT_ID]);
-      if (responseCode === InAppPurchases.IAPResponseCode.OK && results.length > 0) {
-        setProduct(results[0]);
-        console.log('Product loaded:', results[0]);
-      } else {
-        setProduct(null); // ✅ Updated: Set product to null on failure
-        console.warn('No products found or failed to load');
-      }
-    };
-
-    const listener = setPurchaseListener(() => {
-      unlockPremium();
+    const listener = setPurchaseListener(async () => {
+      await unlockPremium(); // Ensure unlockPremium updates AsyncStorage and Firestore
       Alert.alert("Thank you for your purchase! 🥳");
     });
 
-    fetchProducts();
-
+    // Ensure cleanup is handled properly
     return () => {
-      listener.remove?.();
+      if (listener && listener.remove) {
+        listener.remove(); // Clean up listener
+      }
     };
   }, []);
+
+  const fetchProducts = async () => {
+    const { responseCode, results } = await InAppPurchases.getProductsAsync([PRODUCT_ID]);
+    if (responseCode === InAppPurchases.IAPResponseCode.OK && results.length > 0) {
+      setProduct(results[0]);
+      console.log('Product loaded:', results[0]);
+    } else {
+      setProduct(null); // ✅ Updated: Set product to null on failure
+      console.warn('No products found or failed to load');
+    }
+  };
 
   const handleBuy = async () => {
     if (product) {

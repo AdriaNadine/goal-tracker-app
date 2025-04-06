@@ -1,5 +1,3 @@
-// utils/iap.js
-
 import * as InAppPurchases from 'expo-in-app-purchases';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth } from 'firebase/auth';
@@ -10,7 +8,6 @@ const ITEM_ID = 'goal_master_unlock'; // Must match App Store Connect
 
 export const connectToStore = async () => {
   const { responseCode } = await InAppPurchases.connectAsync();
-
   if (responseCode === InAppPurchases.IAPResponseCode.OK) {
     console.log('Connected to App Store ✅');
   } else {
@@ -21,7 +18,6 @@ export const connectToStore = async () => {
 export const getAvailableProducts = async () => {
   const items = [ITEM_ID];
   const { responseCode, results } = await InAppPurchases.getProductsAsync(items);
-
   if (responseCode === InAppPurchases.IAPResponseCode.OK) {
     console.log('Available Products:', results);
     return results;
@@ -38,7 +34,7 @@ export const setPurchaseListener = (onUnlock) => {
         if (!purchase.acknowledged) {
           await InAppPurchases.finishTransactionAsync(purchase, false);
           console.log('✅ Purchase completed and acknowledged');
-          onUnlock(); // Trigger whatever callback the app provides
+          onUnlock(); // Trigger callback to unlock premium
         }
       }
     } else {
@@ -51,13 +47,12 @@ export const unlockPremium = async () => {
   try {
     await AsyncStorage.setItem('isPremiumUser', 'true');
     console.log('✨ Premium unlocked and stored in AsyncStorage');
-
     const auth = getAuth(app);
     const user = auth.currentUser;
     if (user) {
       const db = getFirestore(app);
       await setDoc(doc(db, 'users', user.uid), { isPremium: true }, { merge: true });
-      console.log('✨ Premium status also saved to Firestore');
+      console.log('✨ Premium status saved to Firestore');
     }
   } catch (error) {
     console.error('Failed to unlock premium:', error);
