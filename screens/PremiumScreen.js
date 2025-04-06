@@ -36,15 +36,15 @@ export default function PremiumScreen() {
       }
     };
 
-    setPurchaseListener(async () => {
-      Alert.alert("Thank you!", "Your purchase was successful. 🥳");
-      await unlockPremium();
+    const listener = setPurchaseListener(() => {
+      unlockPremium();
+      Alert.alert("Thank you for your purchase! 🥳");
     });
 
     fetchProducts();
 
     return () => {
-      purchaseListener?.remove?.();
+      listener.remove?.();
     };
   }, []);
 

@@ -47,7 +47,7 @@ const ProgressScreen = () => {
       setSteps(userSteps);
     } catch (error) {
       console.error('Error fetching data:', error);
-      setError(<Text>{error.message}</Text>);
+      setError(error.message);
     }
   };
 
@@ -102,7 +102,7 @@ const ProgressScreen = () => {
       }
     } catch (error) {
       console.error('Error updating step completion:', error);
-      setError(<Text>{error.message}</Text>);
+      setError(error.message);
     }
   };
 
@@ -118,7 +118,7 @@ const ProgressScreen = () => {
       });
     } catch (error) {
       console.error('Error sharing goal:', error);
-      setError(<Text>{error.message}</Text>);
+      setError(error.message);
     }
   };
 
@@ -196,7 +196,6 @@ const ProgressScreen = () => {
                   </Text>
                 </TouchableOpacity>
               </View>
-              // TODO: Consider allowing users to tap and view full goal reflections: why, where, who, when
               <Text allowFontScaling={true} style={[styles.stepDetail, { color: step.completed ? '#888' : '#666' }]}>
                 Priority: {step.urgency} | Deadline: {step.deadline ? new Date(step.deadline).toLocaleDateString() : 'No deadline'} | Completed: {step.completed ? 'Yes' : 'No'}
               </Text>
