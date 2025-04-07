@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
-// import * as InAppPurchases from 'expo-in-app-purchases';
-// import { fetchProducts, purchaseItemAsync } from './utils/iap';
-// import * as Notifications from 'expo-notifications';
+import * as InAppPurchases from 'expo-in-app-purchases';
+import { fetchProducts, purchaseItemAsync } from './utils/iap';
+import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { NavigationContainer } from '@react-navigation/native';

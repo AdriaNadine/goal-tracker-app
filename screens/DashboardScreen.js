@@ -206,15 +206,7 @@ const DashboardScreen = () => {
     <View style={styles.container}>
       <Text style={styles.header} allowFontScaling={true}>Dashboard</Text>
       <View style={styles.tabContainer}>
-  <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate('Categories')}>
-    <Text style={styles.tabText}>Categories</Text>
-  </TouchableOpacity>
-  <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate('GoalQuestionsTab')}>
-    <Text style={styles.tabText}>Goals</Text>
-  </TouchableOpacity>
-  <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate('GoalBreakdown')}>
-    <Text style={styles.tabText}>Steps</Text>
-  </TouchableOpacity>
+
 </View>
       <Text style={styles.quote} allowFontScaling={true}>{`Today’s Motivation: "${quote}"`}</Text>
       <Text style={styles.userInfo} allowFontScaling={true}>Welcome, {userEmail}!</Text>

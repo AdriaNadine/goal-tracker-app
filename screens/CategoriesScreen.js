@@ -94,13 +94,13 @@ const CategoriesScreen = () => {
 
   const handleTemplatePress = (template) => {
     const category = { name: template.category, color: template.color };
-    navigation.navigate('GoalQuestionsTab', { category, templateAnswers: template.answers });
+    navigation.navigate('Goals', { category, templateAnswers: template.answers });
   };
 
   const renderCategory = ({ item }) => (
     <TouchableOpacity
       style={[styles.categoryItem, { borderColor: item.color }]}
-      onPress={() => navigation.navigate('GoalQuestionsTab', { category: item })}
+      onPress={() => navigation.navigate('Goals', { category: item })}
     >
       <Text style={[styles.categoryText, { color: item.color }]}>
         {item.name}
@@ -173,10 +173,9 @@ const CategoriesScreen = () => {
   
                 {/* Color Picker Dropdown — float above everything */}
                 {showPicker && (
-                  <View style={styles.pickerDropdown}>
-                    {colorOptions.map((color) => (
-                      <TouchableOpacity
-                        key={color.value}
+                  <View style={[styles.pickerDropdown, { position: 'absolute', top: 250, left: 20, right: 20 }]}>
+                  {colorOptions.map(color => (
+                    <TouchableOpacity key={color.value}
                         style={styles.pickerItem}
                         onPress={() => {
                           setNewCategoryColor(color.value);
@@ -293,6 +292,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
+    zIndex: 9999,
+elevation: 10,
   },
   pickerItem: {
     flexDirection: 'row',

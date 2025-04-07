@@ -116,26 +116,38 @@ const GuidedMeditationScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header} allowFontScaling={true}>Guided Meditation</Text>
-      <TouchableOpacity style={styles.skipButton} onPress={handleProceed}>
-        <Text style={styles.skipText}>Skip Meditation</Text>
-        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.navigate('Dashboard')}>
-  <Text style={styles.skipText}>Cancel</Text>
-</TouchableOpacity>
+  
+      {/* Cancel and Skip Buttons */}
+      <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.navigate('Dashboard')}>
+        <Text style={styles.skipText}>Cancel</Text>
       </TouchableOpacity>
-      <Text style={styles.prompt} allowFontScaling={true}>{meditationSteps[currentStep].prompt}</Text>
+  
+      <TouchableOpacity style={styles.skipButton} onPress={() => navigation.navigate('Categories')}>
+        <Text style={styles.skipText}>Skip</Text>
+      </TouchableOpacity>
+  
+      {/* Meditation Prompt */}
+      <Text style={styles.prompt} allowFontScaling={true}>
+        {meditationSteps[currentStep].prompt}
+      </Text>
+  
+      {/* Controls: Pause + Restart */}
       <View style={styles.controls}>
-      <TouchableOpacity style={styles.controlButton} onPress={async () => {
-  if (sound && isPlaying) {
-    await sound.pauseAsync();
-    setIsPlaying(false);
-  }
-}}>
-  <Text style={styles.buttonText} allowFontScaling={true}>Pause</Text>
-</TouchableOpacity>
+        <TouchableOpacity style={styles.controlButton} onPress={async () => {
+          if (sound && isPlaying) {
+            await sound.pauseAsync();
+            setIsPlaying(false);
+          }
+        }}>
+          <Text style={styles.buttonText} allowFontScaling={true}>Pause</Text>
+        </TouchableOpacity>
+  
         <TouchableOpacity style={styles.controlButton} onPress={handleRestart}>
           <Text style={styles.buttonText} allowFontScaling={true}>Restart</Text>
         </TouchableOpacity>
       </View>
+  
+      {/* Final Button when Meditation Ends */}
       {currentStep === meditationSteps.length - 1 && !isPlaying && (
         <TouchableOpacity style={styles.button} onPress={handleProceed}>
           <Text style={styles.buttonText} allowFontScaling={true}>Set Your Goals</Text>

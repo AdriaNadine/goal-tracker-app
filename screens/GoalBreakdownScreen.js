@@ -220,7 +220,7 @@ const GoalBreakdownScreen = () => {
         </View>
       )}
 
-      // TODO: Consider validating or parsing the deadline input to ensure it's a valid date format (e.g., with a date picker or regex check)
+      {/* TODO: Consider validating or parsing the deadline input to ensure it's a valid date format (e.g., with a date picker or regex check) */}
       <Text style={styles.label} allowFontScaling={true}>Deadline (e.g., YYYY-MM-DD):</Text>
       <TextInput
         style={styles.input}
