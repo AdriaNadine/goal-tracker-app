@@ -20,11 +20,14 @@ const Tab = createBottomTabNavigator();
 
 function MainTabs() {
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Progress" component={ProgressScreen} />
-      <Tab.Screen name="Premium" component={PremiumScreen} />
-    </Tab.Navigator>
+<Tab.Navigator screenOptions={{ headerShown: false }}>
+  <Tab.Screen name="Dashboard" component={DashboardScreen} />
+  <Tab.Screen name="Categories" component={CategoriesScreen} />
+  <Tab.Screen name="Goals" component={GoalQuestionsScreen} />
+  <Tab.Screen name="Steps" component={GoalBreakdownScreen} />
+  <Tab.Screen name="Progress" component={ProgressScreen} />
+  <Tab.Screen name="Premium" component={PremiumScreen} />
+</Tab.Navigator>
   );
 }
 

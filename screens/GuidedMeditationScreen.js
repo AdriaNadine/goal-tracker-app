@@ -110,7 +110,7 @@ const GuidedMeditationScreen = () => {
   };
 
   const handleProceed = () => {
-    navigation.navigate('Tabs', { screen: 'CategoriesTab' });
+    navigation.navigate('Categories');
   };
 
   return (
@@ -118,12 +118,20 @@ const GuidedMeditationScreen = () => {
       <Text style={styles.header} allowFontScaling={true}>Guided Meditation</Text>
       <TouchableOpacity style={styles.skipButton} onPress={handleProceed}>
         <Text style={styles.skipText}>Skip Meditation</Text>
+        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.navigate('Dashboard')}>
+  <Text style={styles.skipText}>Cancel</Text>
+</TouchableOpacity>
       </TouchableOpacity>
       <Text style={styles.prompt} allowFontScaling={true}>{meditationSteps[currentStep].prompt}</Text>
       <View style={styles.controls}>
-        <TouchableOpacity style={styles.controlButton} onPress={handlePauseResume}>
-          <Text style={styles.buttonText} allowFontScaling={true}>{isPlaying ? 'Pause' : 'Resume'}</Text>
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.controlButton} onPress={async () => {
+  if (sound && isPlaying) {
+    await sound.pauseAsync();
+    setIsPlaying(false);
+  }
+}}>
+  <Text style={styles.buttonText} allowFontScaling={true}>Pause</Text>
+</TouchableOpacity>
         <TouchableOpacity style={styles.controlButton} onPress={handleRestart}>
           <Text style={styles.buttonText} allowFontScaling={true}>Restart</Text>
         </TouchableOpacity>
@@ -144,6 +152,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     backgroundColor: '#E6F0FA',
+  },
+  cancelButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    backgroundColor: 'transparent',
+    padding: 10,
   },
   header: {
     fontSize: 24,

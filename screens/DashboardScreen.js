@@ -205,6 +205,17 @@ const DashboardScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header} allowFontScaling={true}>Dashboard</Text>
+      <View style={styles.tabContainer}>
+  <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate('Categories')}>
+    <Text style={styles.tabText}>Categories</Text>
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate('GoalQuestionsTab')}>
+    <Text style={styles.tabText}>Goals</Text>
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate('GoalBreakdown')}>
+    <Text style={styles.tabText}>Steps</Text>
+  </TouchableOpacity>
+</View>
       <Text style={styles.quote} allowFontScaling={true}>{`Today’s Motivation: "${quote}"`}</Text>
       <Text style={styles.userInfo} allowFontScaling={true}>Welcome, {userEmail}!</Text>
       <Text style={styles.sectionTitle} allowFontScaling={true}>Your Categories</Text>
@@ -397,6 +408,22 @@ const styles = StyleSheet.create({
   logoutText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 15,
+  },
+  tabButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+  },
+  tabText: {
+    color: '#fff',
+    fontSize: 14,
     fontWeight: 'bold',
   },
 });
