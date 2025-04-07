@@ -170,24 +170,6 @@ const CategoriesScreen = () => {
                     {colorOptions.find((color) => color.value === newCategoryColor)?.label || 'Pick a color'}
                   </Text>
                 </TouchableOpacity>
-  
-                {/* Color Picker Dropdown — float above everything */}
-                {showPicker && (
-                  <View style={[styles.pickerDropdown, { position: 'absolute', top: 250, left: 20, right: 20 }]}>
-                  {colorOptions.map(color => (
-                    <TouchableOpacity key={color.value}
-                        style={styles.pickerItem}
-                        onPress={() => {
-                          setNewCategoryColor(color.value);
-                          setShowPicker(false);
-                        }}
-                      >
-                        <Text style={styles.pickerItemText}>{color.label}</Text>
-                        <View style={getColorSquareStyle(color.value)} />
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
               </View>
             </View>
   
@@ -217,6 +199,27 @@ const CategoriesScreen = () => {
           </>
         }
       />
+  
+      {/* 🔥 COLOR PICKER FLOATING ABOVE ALL */}
+      {showPicker && (
+        <View style={styles.absoluteOverlay}>
+          <View style={styles.pickerDropdown}>
+            {colorOptions.map(color => (
+              <TouchableOpacity
+                key={color.value}
+                style={styles.pickerItem}
+                onPress={() => {
+                  setNewCategoryColor(color.value);
+                  setShowPicker(false);
+                }}
+              >
+                <Text style={styles.pickerItemText}>{color.label}</Text>
+                <View style={getColorSquareStyle(color.value)} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -277,23 +280,29 @@ const styles = StyleSheet.create({
     color: '#000',
     textAlign: 'center',
   },
-  pickerDropdown: {
+  absoluteOverlay: {
     position: 'absolute',
-    top: 60,
+    top: 150, // adjust as needed for vertical alignment
     left: 0,
     right: 0,
+    alignItems: 'center',
+    zIndex: 9999,
+    elevation: 20,
+  },
+  
+  pickerDropdown: {
+    width: '90%',
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
     zIndex: 9999,
-    elevation: 10,
+    elevation: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    zIndex: 9999,
-elevation: 10,
+    paddingVertical: 10,
   },
   pickerItem: {
     flexDirection: 'row',
