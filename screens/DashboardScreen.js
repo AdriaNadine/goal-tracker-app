@@ -5,6 +5,7 @@ import { auth, db } from '../config/firebase';
 import { signOut } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import usePremiumStatus from '../hooks/usePremiumStatus';
+import GuidedMeditationScreen from './GuidedMeditationScreen';
 
 const motivationalQuotes = [
   "Small steps every day lead to big results.",
@@ -245,7 +246,7 @@ const DashboardScreen = () => {
       )}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('GuidedMeditation')}
+        onPress={() => navigation.navigate('Meditation')}  // Ensure it navigates correctly to GuidedMeditation screen
       >
         <Text style={styles.buttonText} allowFontScaling={true}>Start Guided Meditation</Text>
       </TouchableOpacity>

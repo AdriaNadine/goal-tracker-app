@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import WelcomeScreen from './screens/WelcomeScreen';
 import InstructionScreen from './screens/InstructionScreen';
 import SignInScreen from './screens/SignInScreen';
-import GuidedMeditationScreen from './screens/GuidedMeditationScreen';
+import GuidedMeditationScreen from './screens/GuidedMeditationScreen'; // Ensure it is imported
 import CategoriesScreen from './screens/CategoriesScreen';
 import GoalQuestionsScreen from './screens/GoalQuestionsScreen';
 import GoalBreakdownScreen from './screens/GoalBreakdownScreen';

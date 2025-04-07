@@ -5,10 +5,13 @@ export default {
     version: "2.0.2",
     icon: "./assets/icon.png",
     ios: {
-      bundleIdentifier: "com.adriaross.goaltracker",
-      googleServicesFile: process.env.GOOGLE_SERVICES_PLIST || "./assets/ios/GoogleService-Info.plist",
+      bundleIdentifier: 'com.adriaross.goaltracker',
+      googleServicesFile: './assets/ios/GoogleService-Info.plist',
       infoPlist: {
-        ITSAppUsesNonExemptEncryption: false
+        ITSAppUsesNonExemptEncryption: false,
+        NSMicrophoneUsageDescription: 'This app uses your microphone for guided meditations.',
+        NSCalendarsUsageDescription: 'This app needs access to your calendar to manage reminders.',
+NSUserNotificationAlertUsageDescription: 'This app needs permission to send you notifications.'
       }
     },
     android: {
