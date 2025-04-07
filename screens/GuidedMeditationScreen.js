@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Animated } from 'react-native';
 import { Audio } from 'expo-av';
 
 const GuidedMeditationScreen = () => {
@@ -39,6 +40,8 @@ const GuidedMeditationScreen = () => {
       audio: require('../assets/audio/step7.mp3'),
     },
   ];
+
+  const fadeAnim = useState(new Animated.Value(1))[0]; // opacity starts at 1
 
   const playStepAudio = async (stepIndex) => {
     if (sound) {
@@ -100,13 +103,34 @@ const GuidedMeditationScreen = () => {
 
   const handleRestart = async () => {
     if (sound) {
-      await sound.stopAsync();
-      await sound.unloadAsync();
-      setSound(null);
+      try {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+        setSound(null);
+      } catch (err) {
+        console.warn('⚠️ Error unloading sound on restart:', err);
+      }
     }
+  
+    // ✨ Animate fade-out
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  
     setIsPlaying(false);
     setCurrentStep(0);
-    await playStepAudio(0); // Explicitly start step 0
+  
+    // slight delay before restarting audio
+    setTimeout(() => playStepAudio(0), 50);
   };
 
   const handleProceed = () => {
@@ -114,7 +138,7 @@ const GuidedMeditationScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <Text style={styles.header} allowFontScaling={true}>Guided Meditation</Text>
   
       {/* Cancel and Skip Buttons */}
@@ -122,9 +146,22 @@ const GuidedMeditationScreen = () => {
         <Text style={styles.skipText}>Cancel</Text>
       </TouchableOpacity>
   
-      <TouchableOpacity style={styles.skipButton} onPress={() => navigation.navigate('Categories')}>
-        <Text style={styles.skipText}>Skip</Text>
-      </TouchableOpacity>
+      <TouchableOpacity
+  style={styles.skipButton}
+  onPress={async () => {
+    if (sound) {
+      try {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+      } catch (err) {
+        console.warn('⚠️ Failed to stop sound:', err);
+      }
+    }
+    navigation.navigate('Categories');
+  }}
+>
+  <Text style={styles.skipText}>Skip</Text>
+</TouchableOpacity>
   
       {/* Meditation Prompt */}
       <Text style={styles.prompt} allowFontScaling={true}>
@@ -153,7 +190,7 @@ const GuidedMeditationScreen = () => {
           <Text style={styles.buttonText} allowFontScaling={true}>Set Your Goals</Text>
         </TouchableOpacity>
       )}
-    </View>
+    </Animated.View>
   );
 };
 
