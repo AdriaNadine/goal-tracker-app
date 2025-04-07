@@ -3,15 +3,15 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
 import * as InAppPurchases from 'expo-in-app-purchases';
+import * as Notifications from 'expo-notifications';
 import { setPurchaseListener, unlockPremium } from '../utils/iap';
-import * as Notifications from 'expo-notifications'; // ✅ NEW: Import notifications
 
-const PRODUCT_ID = 'goal_master_unlock'; // Must match App Store Connect
+const PRODUCT_ID = 'goal_master_unlock'; // Your App Store product ID
 
 export default function PremiumScreen() {
   const [product, setProduct] = useState(null);
 
-  // ✅ NEW: Request notification permissions
+  // 🔔 Request user permission for notifications
   const requestNotificationPermission = async () => {
     const { status } = await Notifications.getPermissionsAsync();
     if (status !== 'granted') {
@@ -22,44 +22,48 @@ export default function PremiumScreen() {
     }
   };
 
-  useEffect(() => {
-    requestNotificationPermission(); // ✅ NEW: Ask for permissions on load
-
-    const listener = setPurchaseListener(async () => {
-      await unlockPremium(); // Ensure unlockPremium updates AsyncStorage and Firestore
-      Alert.alert("Thank you for your purchase! 🥳");
-    });
-
-    // Ensure cleanup is handled properly
-    return () => {
-      if (listener && listener.remove) {
-        listener.remove(); // Clean up listener
-      }
-    };
-  }, []);
-
+  // 🧠 Fetch product info
   const fetchProducts = async () => {
     const { responseCode, results } = await InAppPurchases.getProductsAsync([PRODUCT_ID]);
     if (responseCode === InAppPurchases.IAPResponseCode.OK && results.length > 0) {
       setProduct(results[0]);
-      console.log('Product loaded:', results[0]);
+      console.log('✅ Product loaded:', results[0]);
     } else {
-      setProduct(null); // ✅ Updated: Set product to null on failure
-      console.warn('No products found or failed to load');
+      setProduct(null);
+      console.warn('⚠️ No products found or failed to load');
     }
   };
 
+  // 💳 Purchase the product
   const handleBuy = async () => {
     if (product) {
       try {
         await InAppPurchases.purchaseItemAsync(product.productId);
       } catch (error) {
         Alert.alert("Purchase error", "An error occurred while trying to make the purchase.");
+        console.warn(error);
       }
     } else {
       Alert.alert("Product not available", "Unable to purchase at this time.");
     }
   };
+
+  // 📡 Setup IAP listeners and notification permissions
+  useEffect(() => {
+    requestNotificationPermission();
+    fetchProducts();
+    InAppPurchases.connectAsync();
+
+    const listener = setPurchaseListener(async () => {
+      await unlockPremium();
+      Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
+    });
+
+    return () => {
+      if (listener?.remove) listener.remove();
+      InAppPurchases.disconnectAsync();
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -67,10 +71,11 @@ export default function PremiumScreen() {
       <Text style={styles.description} allowFontScaling={true}>
         Unlock unlimited goals, save your reflections, and personalize your dashboard!
       </Text>
+
       {product ? (
         <Button title={`Buy for ${product.price}`} onPress={handleBuy} />
       ) : (
-        <Text style={styles.errorMessage}>Product is currently unavailable.</Text> // ✅ Added fallback error message
+        <Text style={styles.errorMessage}>⚠️ Product is currently unavailable.</Text>
       )}
     </View>
   );
@@ -80,5 +85,5 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
   description: { fontSize: 16, textAlign: 'center', marginBottom: 20 },
-  errorMessage: { fontSize: 16, color: 'red', marginTop: 20 }, // ✅ Added style for error message
+  errorMessage: { fontSize: 16, color: 'red', marginTop: 20 },
 });
