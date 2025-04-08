@@ -6,7 +6,7 @@ import * as InAppPurchases from 'expo-in-app-purchases';
 import * as Notifications from 'expo-notifications';
 import { setPurchaseListener, unlockPremium } from '../utils/iap';
 
-const PRODUCT_ID = 'goal_master_unlock'; // Your App Store product ID
+const PRODUCT_ID = 'goal_master_unlock'; // ✅ Matches App Store product
 
 export default function PremiumScreen() {
   const [product, setProduct] = useState(null);
@@ -22,15 +22,18 @@ export default function PremiumScreen() {
     }
   };
 
-  // 🧠 Fetch product info
+  // 🧠 Fetch product info from Apple
   const fetchProducts = async () => {
-    const { responseCode, results } = await InAppPurchases.getProductsAsync([PRODUCT_ID]);
-    if (responseCode === InAppPurchases.IAPResponseCode.OK && results.length > 0) {
-      setProduct(results[0]);
-      console.log('✅ Product loaded:', results[0]);
-    } else {
-      setProduct(null);
-      console.warn('⚠️ No products found or failed to load');
+    try {
+      const { responseCode, results } = await InAppPurchases.getProductsAsync([PRODUCT_ID]);
+      if (responseCode === InAppPurchases.IAPResponseCode.OK && results.length > 0) {
+        setProduct(results[0]);
+        console.log('✅ Product loaded:', results[0]);
+      } else {
+        console.warn('⚠️ No products found or failed to load');
+      }
+    } catch (err) {
+      console.warn('🔥 Error fetching products:', err);
     }
   };
 
@@ -48,26 +51,25 @@ export default function PremiumScreen() {
     }
   };
 
-  // 📡 Setup IAP listeners and notification permissions
+  // 📡 Setup listeners + permissions safely
   useEffect(() => {
     const init = async () => {
       try {
         await requestNotificationPermission();
         await InAppPurchases.connectAsync();
         await fetchProducts();
-  
+
         setPurchaseListener(async () => {
           await unlockPremium();
           Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
         });
-  
       } catch (err) {
-        console.warn("🔥 Error in IAP init:", err);
+        console.warn("🔥 IAP init error:", err);
       }
     };
-  
+
     init();
-  
+
     return () => {
       InAppPurchases.disconnectAsync();
     };
@@ -80,7 +82,8 @@ export default function PremiumScreen() {
         Unlock unlimited goals, save your reflections, and personalize your dashboard!
       </Text>
 
-      {product ? (
+      {/* ✅ Crash-proof render check */}
+      {product && typeof product.price === 'string' ? (
         <Button title={`Buy for ${product.price}`} onPress={handleBuy} />
       ) : (
         <Text style={styles.errorMessage}>⚠️ Product is currently unavailable.</Text>
