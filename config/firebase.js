@@ -54,9 +54,9 @@ try {
 // Check auth state
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    console.log(<Text>✅ Firebase user is signed in: {user.email}</Text>);
+    console.log("Firebase API Key:", EXPO_PUBLIC_FIREBASE_API_KEY);
   } else {
-    console.log(<Text>❌ No Firebase user is signed in.</Text>);
+    console.log("Firebase Project ID:", EXPO_PUBLIC_FIREBASE_PROJECT_ID);
   }
 });
 
