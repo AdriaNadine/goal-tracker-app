@@ -50,17 +50,25 @@ export default function PremiumScreen() {
 
   // 📡 Setup IAP listeners and notification permissions
   useEffect(() => {
-    requestNotificationPermission();
-    fetchProducts();
-    InAppPurchases.connectAsync();
-
-    const listener = setPurchaseListener(async () => {
-      await unlockPremium();
-      Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
-    });
-
+    const init = async () => {
+      try {
+        await requestNotificationPermission();
+        await InAppPurchases.connectAsync();
+        await fetchProducts();
+  
+        setPurchaseListener(async () => {
+          await unlockPremium();
+          Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
+        });
+  
+      } catch (err) {
+        console.warn("🔥 Error in IAP init:", err);
+      }
+    };
+  
+    init();
+  
     return () => {
-      if (listener?.remove) listener.remove();
       InAppPurchases.disconnectAsync();
     };
   }, []);
