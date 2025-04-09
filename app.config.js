@@ -2,9 +2,10 @@ export default {
   expo: {
     name: "Goal Tracker",
     slug: "goal-tracker-app",
-    version: "2.0.2",
+    version: "3.0.0",
     icon: "./assets/icon.png",
     ios: {
+      buildNumber: "1",
       bundleIdentifier: 'com.adriaross.goaltracker',
       googleServicesFile: './assets/ios/GoogleService-Info.plist',
       infoPlist: {
@@ -15,6 +16,7 @@ NSUserNotificationAlertUsageDescription: 'This app needs permission to send you 
       }
     },
     android: {
+      versionCode: 1,
       package: "com.adriaross.goaltracker"
     },
     plugins: [
