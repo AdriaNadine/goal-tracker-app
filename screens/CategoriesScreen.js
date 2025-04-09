@@ -94,13 +94,13 @@ const CategoriesScreen = () => {
 
   const handleTemplatePress = (template) => {
     const category = { name: template.category, color: template.color };
-    navigation.navigate('Goals', { category, templateAnswers: template.answers });
+    navigation.navigate('GoalsQuestions', { category, templateAnswers: template.answers });
   };
 
   const renderCategory = ({ item }) => (
     <TouchableOpacity
       style={[styles.categoryItem, { borderColor: item.color }]}
-      onPress={() => navigation.navigate('Goals', { category: item })}
+      onPress={() => navigation.navigate('GoalsQuestions', { category: item })}
     >
       <Text style={[styles.categoryText, { color: item.color }]}>
         {item.name}

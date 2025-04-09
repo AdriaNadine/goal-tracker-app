@@ -20,8 +20,8 @@ import { getFirestore } from "firebase/firestore";
 import { Text } from 'react-native'; // Import Text component
 
 // Log environment values for debugging
-console.log(<Text>Firebase API Key: {EXPO_PUBLIC_FIREBASE_API_KEY}</Text>);
-console.log(<Text>Firebase Project ID: {EXPO_PUBLIC_FIREBASE_PROJECT_ID}</Text>);
+console.log("Firebase API Key:", EXPO_PUBLIC_FIREBASE_API_KEY);
+console.log("Firebase Project ID:", EXPO_PUBLIC_FIREBASE_PROJECT_ID);
 
 // Firebase config
 const firebaseConfig = {

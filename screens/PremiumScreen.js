@@ -59,10 +59,14 @@ export default function PremiumScreen() {
         await InAppPurchases.connectAsync();
         await fetchProducts();
 
-        setPurchaseListener(async () => {
-          await unlockPremium();
-          Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
-        });
+        if (InAppPurchases?.setPurchaseListener) {
+          setPurchaseListener(async () => {
+            await unlockPremium();
+            Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
+          });
+        } else {
+          console.warn("💥 IAP not available — skipping listener.");
+        }
       } catch (err) {
         console.warn("🔥 IAP init error:", err);
       }
