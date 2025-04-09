@@ -7,6 +7,12 @@ import { recheckPremiumStatus } from '../hooks/usePremiumStatus'; // Import rech
 
 const PRODUCT_ID = 'goal_master_unlock'; // ✅ Matches App Store product
 
+initPurchaseListener(async () => {
+  await unlockPremium();
+  await recheckPremiumStatus(() => {}); // placeholder, not used outside UI
+  Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
+});
+
 export default function PremiumScreen() {
   const [product, setProduct] = useState(null);
   const [isPremium, setIsPremium] = useState(false); // Add local premium state
@@ -58,12 +64,6 @@ export default function PremiumScreen() {
         await requestNotificationPermission();
         await InAppPurchases.connectAsync();
         await fetchProducts();
-
-        initPurchaseListener(async () => { // Updated listener
-          await unlockPremium();
-          await recheckPremiumStatus(setIsPremium);
-          Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
-        });
       } catch (err) {
         console.warn("🔥 IAP init error:", err);
       }

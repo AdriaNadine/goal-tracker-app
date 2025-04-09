@@ -90,7 +90,7 @@ const ProgressScreen = () => {
           xp += 10;
           // TODO: Consider syncing XP to Firestore for cross-device tracking and persistence
           await AsyncStorage.setItem('userXP', xp.toString());
-          Alert.alert('Step Completed', <Text>You earned 10 XP! Total XP: {xp}</Text>);
+          Alert.alert("Step Completed", `You earned 10 XP! Total XP: ${xp}`);
 
           if (xp % 100 === 0) {
             setShowConfetti(true);
