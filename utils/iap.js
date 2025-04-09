@@ -27,14 +27,19 @@ export const getAvailableProducts = async () => {
   }
 };
 
-export const setPurchaseListener = (onUnlock) => {
+export const initPurchaseListener = (onUnlock) => {
   InAppPurchases.setPurchaseListener(async ({ responseCode, results, errorCode }) => {
+    console.log('📦 Global Purchase listener triggered', { responseCode, results, errorCode });
+
     if (responseCode === InAppPurchases.IAPResponseCode.OK) {
       for (const purchase of results) {
+        console.log('🧾 Purchase result:', purchase);
         if (!purchase.acknowledged) {
+          console.log('✅ Unacknowledged purchase — finishing transaction...');
           await InAppPurchases.finishTransactionAsync(purchase, false);
-          console.log('✅ Purchase completed and acknowledged');
-          onUnlock(); // Trigger callback to unlock premium
+          await onUnlock();
+        } else {
+          console.log('🟡 Purchase already acknowledged');
         }
       }
     } else {

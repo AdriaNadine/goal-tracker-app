@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
 import * as InAppPurchases from 'expo-in-app-purchases';
 import * as Notifications from 'expo-notifications';
-import { setPurchaseListener, unlockPremium } from '../utils/iap';
+import { initPurchaseListener, unlockPremium } from '../utils/iap'; // Updated import
 import { recheckPremiumStatus } from '../hooks/usePremiumStatus'; // Import recheckPremiumStatus
 
 const PRODUCT_ID = 'goal_master_unlock'; // ✅ Matches App Store product
@@ -59,15 +59,11 @@ export default function PremiumScreen() {
         await InAppPurchases.connectAsync();
         await fetchProducts();
 
-        if (InAppPurchases?.setPurchaseListener) {
-          setPurchaseListener(async () => {
-            await unlockPremium();
-            await recheckPremiumStatus(setIsPremium); // Trigger recheck
-            Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
-          });
-        } else {
-          console.warn("💥 IAP not available — skipping listener.");
-        }
+        initPurchaseListener(async () => { // Updated listener
+          await unlockPremium();
+          await recheckPremiumStatus(setIsPremium);
+          Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
+        });
       } catch (err) {
         console.warn("🔥 IAP init error:", err);
       }
