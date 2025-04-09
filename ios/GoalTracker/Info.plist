@@ -19,7 +19,7 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0.2</string>
+	<string>3.0.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -75,7 +75,7 @@
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
-<string>This app plays guided meditation audio and may access audio features.</string>
+	<string>This app plays guided meditation audio and may access audio features.</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>

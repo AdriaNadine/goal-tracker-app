@@ -25,6 +25,7 @@ const usePremiumStatus = () => {
             return;
           }
         }
+      
 
         // fallback to local storage
         const value = await AsyncStorage.getItem('hasPremium');
@@ -38,8 +39,35 @@ const usePremiumStatus = () => {
 
     check();
   }, []);
+  
 
   return isPremium;
+};
+
+export const recheckPremiumStatus = async (setIsPremium) => {
+  try {
+    const auth = getAuth(app);
+    const user = auth.currentUser;
+
+    if (user) {
+      const db = getFirestore(app);
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const premium = userSnap.data().isPremium === true;
+        setIsPremium(premium);
+        await AsyncStorage.setItem('hasPremium', premium.toString());
+        return;
+      }
+    }
+
+    const value = await AsyncStorage.getItem('hasPremium');
+    setIsPremium(value === 'true');
+  } catch (error) {
+    const value = await AsyncStorage.getItem('hasPremium');
+    setIsPremium(value === 'true');
+  }
 };
 
 export default usePremiumStatus;

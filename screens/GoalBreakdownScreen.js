@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, TextInput } 
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
 import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import * as Haptics from 'expo-haptics';
 
 const GoalBreakdownScreen = () => {
   const navigation = useNavigation();
@@ -14,6 +16,15 @@ const GoalBreakdownScreen = () => {
   const [deadline, setDeadline] = useState(answers?.when || '');
   const [editingStepId, setEditingStepId] = useState(null);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const showDatePicker = () => setDatePickerVisibility(true);
+  const hideDatePicker = () => setDatePickerVisibility(false);
+  const handleDateConfirm = (date) => {
+    const formatted = date.toISOString().split('T')[0];
+    setDeadline(formatted);
+    hideDatePicker();
+  };
 
   const priorityOptions = [
     { label: 'High', value: 'High' },
@@ -82,9 +93,6 @@ const GoalBreakdownScreen = () => {
         setEditingStepId(null);
       } else {
         await addDoc(collection(db, 'steps'), stepData);
-      // if (deadline) {
-      //    await scheduleNotification(stepData, new Date(deadline));
-     //   }
       }
       setStepText('');
       setUrgency('Medium');
@@ -137,12 +145,18 @@ const GoalBreakdownScreen = () => {
   };
 
   const handleSaveSteps = () => {
-    if (steps.length === 0) {
-      Alert.alert('Error', 'Please add at least one step.');
-      return;
+    try {
+      if (!Array.isArray(steps) || steps.length === 0) {
+        Alert.alert('Error', 'Please add at least one step.');
+        return;
+      }
+      Alert.alert('Success', 'Your steps have been saved!');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      navigation.navigate('MainTabs', { screen: 'Progress' });
+    } catch (error) {
+      console.error('Error completing goal:', error);
+      Alert.alert('Error', 'Something went wrong when saving your steps.');
     }
-    Alert.alert('Success', 'Your steps have been saved!');
-    navigation.navigate('MainTabs', { screen: 'Progress' });
   };
 
   const renderStepItem = ({ item, index }) => (
@@ -220,13 +234,15 @@ const GoalBreakdownScreen = () => {
         </View>
       )}
 
-      {/* TODO: Consider validating or parsing the deadline input to ensure it's a valid date format (e.g., with a date picker or regex check) */}
-      <Text style={styles.label} allowFontScaling={true}>Deadline (e.g., YYYY-MM-DD):</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter deadline"
-        value={deadline}
-        onChangeText={setDeadline}
+      <Text style={styles.label} allowFontScaling={true}>Deadline:</Text>
+      <TouchableOpacity style={styles.input} onPress={showDatePicker}>
+        <Text style={{ fontSize: 16 }}>{deadline || 'Select a date'}</Text>
+      </TouchableOpacity>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleDateConfirm}
+        onCancel={hideDatePicker}
       />
 
       <TouchableOpacity style={styles.addButton} onPress={addOrUpdateStep}>

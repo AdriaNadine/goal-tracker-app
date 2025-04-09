@@ -5,7 +5,6 @@ export default {
     version: "3.0.0",
     icon: "./assets/icon.png",
     ios: {
-      buildNumber: "1",
       bundleIdentifier: 'com.adriaross.goaltracker',
       googleServicesFile: './assets/ios/GoogleService-Info.plist',
       infoPlist: {
