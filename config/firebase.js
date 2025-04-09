@@ -17,13 +17,12 @@ import {
 } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
-import { Text } from 'react-native'; // Import Text component
 
-// Log environment values for debugging
-console.log("Firebase API Key:", EXPO_PUBLIC_FIREBASE_API_KEY);
-console.log("Firebase Project ID:", EXPO_PUBLIC_FIREBASE_PROJECT_ID);
+// Log env values to verify loading correctly
+console.log("📦 ENV Firebase API Key:", EXPO_PUBLIC_FIREBASE_API_KEY);
+console.log("📦 ENV Firebase Project ID:", EXPO_PUBLIC_FIREBASE_PROJECT_ID);
 
-// Firebase config
+// Firebase config using .env values
 const firebaseConfig = {
   apiKey: EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -34,10 +33,13 @@ const firebaseConfig = {
   measurementId: EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase app
+// Log config object for debug
+console.log("📦 iOS Firebase Config:", firebaseConfig);
+
+// Initialize Firebase app (singleton)
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize Firebase Auth (with persistence guard)
+// Initialize Firebase Auth with persistence support
 let auth;
 try {
   auth = initializeAuth(app, {
@@ -51,19 +53,19 @@ try {
   }
 }
 
-// Check auth state
+// Track auth changes
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    console.log("Firebase API Key:", EXPO_PUBLIC_FIREBASE_API_KEY);
+    console.log("👤 Logged in user detected.");
   } else {
-    console.log("Firebase Project ID:", EXPO_PUBLIC_FIREBASE_PROJECT_ID);
+    console.log("👤 No user signed in.");
   }
 });
 
 // Initialize Firestore
 const db = getFirestore(app);
 
-// Lazy load Firebase Analytics in supported environments only
+// Conditionally load analytics for web only
 let analytics;
 if (typeof window !== "undefined") {
   import("firebase/analytics").then(({ getAnalytics, isSupported }) => {
@@ -75,4 +77,5 @@ if (typeof window !== "undefined") {
   });
 }
 
-export { app, auth, db, analytics };
+// Export everything needed
+export { app, auth, db, analytics, firebaseConfig };

@@ -6,10 +6,26 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyBT1JdEudWXmdROFLEv97AxQmP-K4fVAOk",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "goaltracker-36dfb.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "goaltracker-36dfb",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "goaltracker-36dfb.appspot.com",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "38589116978",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:38589116978:ios:de24ff2edf86e5edcc422b"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyBT1JdEudWXmdROFLEv97AxQmP-K4fVAOk",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "goaltracker-36dfb.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "goaltracker-36dfb",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "goaltracker-36dfb.appspot.com",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "38589116978",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:38589116978:ios:de24ff2edf86e5edcc422b"
+      }
     }
   }
 }
