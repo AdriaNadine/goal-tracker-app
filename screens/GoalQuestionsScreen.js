@@ -106,8 +106,11 @@ const GoalQuestionsScreen = () => {
       }
       // TODO: Consider using 'why', 'where', and 'who' answers to enrich goal reflection features or dashboard insights.
       // For example: create a reflection summary, show insights on goal details screen, or track motivation over time.
-      Alert.alert('Success', 'Your goal has been saved!');
-      navigation.navigate('GoalBreakdownTab', { category, answers, goalId });
+      Alert.alert(
+        'Success',
+        'Your goal has been saved!',
+        [{ text: 'OK', onPress: () => navigation.navigate('Steps', { category, answers, goalId }) }]
+      );
     } catch (error) {
       console.error('Error saving goals:', error);
       Alert.alert('Error', `Failed to save goals: ${error.message}`);
