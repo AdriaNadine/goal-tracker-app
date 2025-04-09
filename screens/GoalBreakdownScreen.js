@@ -239,6 +239,9 @@ const GoalBreakdownScreen = () => {
         renderItem={renderStepItem}
         ListEmptyComponent={<Text style={styles.emptyText} allowFontScaling={true}>No steps added yet.</Text>}
       />
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Categories')}>
+  <Text style={styles.backButtonText} allowFontScaling={true}>← Back to Categories</Text>
+</TouchableOpacity>
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveSteps}>
         <Text style={styles.saveButtonText} allowFontScaling={true}>Done</Text>
@@ -379,6 +382,18 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  backButton: {
+    backgroundColor: '#aaa',
+    padding: 12,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  backButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',

@@ -50,7 +50,6 @@ export default function AppNavigator({ user }) {
           <Stack.Screen name="Meditation" component={GuidedMeditationScreen} />
           <Stack.Screen name="Categories" component={CategoriesScreen} />
           <Stack.Screen name="GoalQuestions" component={GoalQuestionsScreen} />
-          <Stack.Screen name="GoalBreakdown" component={GoalBreakdownScreen} />
         </>
       )}
     </Stack.Navigator>

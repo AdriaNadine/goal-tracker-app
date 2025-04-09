@@ -122,7 +122,7 @@ const GoalQuestionsScreen = () => {
 
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => navigation.navigate('CategoriesTab')}
+        onPress={() => navigation.navigate('Tabs', { screen: 'Categories' })}
       >
         <Text style={styles.navButtonText} allowFontScaling={true}>Back to Categories</Text>
       </TouchableOpacity>
