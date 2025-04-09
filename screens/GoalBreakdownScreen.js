@@ -11,7 +11,7 @@ const GoalBreakdownScreen = () => {
   const [steps, setSteps] = useState([]);
   const [stepText, setStepText] = useState('');
   const [urgency, setUrgency] = useState('Medium');
-  const [deadline, setDeadline] = useState('');
+  const [deadline, setDeadline] = useState(answers?.when || '');
   const [editingStepId, setEditingStepId] = useState(null);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
 
@@ -82,9 +82,9 @@ const GoalBreakdownScreen = () => {
         setEditingStepId(null);
       } else {
         await addDoc(collection(db, 'steps'), stepData);
-        if (deadline) {
-          await scheduleNotification(stepData, new Date(deadline));
-        }
+      // if (deadline) {
+      //    await scheduleNotification(stepData, new Date(deadline));
+     //   }
       }
       setStepText('');
       setUrgency('Medium');
@@ -142,7 +142,7 @@ const GoalBreakdownScreen = () => {
       return;
     }
     Alert.alert('Success', 'Your steps have been saved!');
-    navigation.navigate('Tabs', { screen: 'Progress' });
+    navigation.navigate('MainTabs', { screen: 'Progress' });
   };
 
   const renderStepItem = ({ item, index }) => (

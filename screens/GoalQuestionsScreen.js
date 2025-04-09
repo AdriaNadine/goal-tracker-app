@@ -109,13 +109,21 @@ const GoalQuestionsScreen = () => {
       Alert.alert(
         'Success',
         'Your goal has been saved!',
-        [{ text: 'OK', onPress: () => navigation.navigate('Steps', { category, answers, goalId }) }]
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('MainTabs', {
+              screen: 'Steps',
+              params: { category, answers, goalId }
+            }),
+          }
+        ]
       );
     } catch (error) {
       console.error('Error saving goals:', error);
       Alert.alert('Error', `Failed to save goals: ${error.message}`);
     }
-  };
+      };
 
   return (
     <View style={styles.container}>
