@@ -76,10 +76,7 @@ const DashboardScreen = () => {
       setUserEmail('');
       setGoals([]);
       setSteps([]);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'SignIn' }],
-      });
+      navigation.navigate('Welcome');
     } catch (error) {
       console.error('Logout error:', error);
       Alert.alert('Error', 'Failed to log out.');
