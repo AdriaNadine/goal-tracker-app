@@ -134,7 +134,7 @@ const GuidedMeditationScreen = () => {
   };
 
   const handleProceed = () => {
-    navigation.navigate('Categories');
+    navigation.navigate('MainTabs', { screen: 'Categories' });
   };
 
   return (

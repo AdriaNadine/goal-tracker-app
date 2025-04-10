@@ -4,7 +4,6 @@ import DashboardScreen from './DashboardScreen';
 import ProgressScreen from './ProgressScreen';
 import PremiumScreen from './PremiumScreen';
 import CategoriesScreen from './CategoriesScreen';
-import GoalQuestionsScreen from './GoalQuestionsScreen';
 import GoalBreakdownScreen from './GoalBreakdownScreen';
 import { View, Text } from 'react-native';
 
@@ -22,7 +21,7 @@ function MainTabs() {
   return (
     <Tab.Navigator>
       <Tab.Screen name="Categories" component={CategoriesScreen} />
-      <Tab.Screen name="Goals" component={GoalQuestionsScreen} />
+      <Tab.Screen name="Goals" component={GoalsScreen} />
       <Tab.Screen name="Steps" component={GoalBreakdownScreen} />
       <Tab.Screen name="Progress" component={ProgressScreen} />
       <Tab.Screen name="Dashboard" component={DashboardScreen} />

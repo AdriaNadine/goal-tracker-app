@@ -7,7 +7,7 @@ import { scheduleMotivationalReminder } from '../utils/notifications';
 import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const GoalQuestionsScreen = () => {
+const GoalsScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const category = route.params?.category || { name: "Unknown", color: "#000000" };
@@ -134,7 +134,7 @@ const GoalQuestionsScreen = () => {
 
         <TouchableOpacity
           style={styles.navButton}
-          onPress={() => navigation.navigate('Categories', { screen: 'Categories' })}
+          onPress={() => navigation.navigate('Categories')}
         >
           <Text style={styles.navButtonText} allowFontScaling={true}>Back to Categories</Text>
         </TouchableOpacity>
@@ -262,4 +262,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GoalQuestionsScreen;
+export default GoalsScreen;

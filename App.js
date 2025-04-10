@@ -16,10 +16,6 @@ import { auth } from './config/firebase';
 
 const PRODUCT_ID = 'goal_master_unlock';
 
-function PremiumScreen() {
-  return null;
-}
-
 export default function App() {
   const isPremium = usePremiumStatus();
   const version =
@@ -72,18 +68,7 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <Text style={{
-        position: 'absolute',
-        top: 50,
-        left: 10,
-        zIndex: 999,
-        backgroundColor: 'yellow',
-        padding: 5,
-        fontSize: 12
-      }}>
-        BUILD: development | VERSION: {version} | USER: {isPremium ? 'Premium ✅' : 'Free ❌'}
-      </Text>
+    <NavigationContainer style={{ paddingTop: 40 }}>
       <AppNavigator user={user} />
     </NavigationContainer>
   );
