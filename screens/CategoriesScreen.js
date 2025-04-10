@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, TextInput, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
 import { collection, addDoc, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
@@ -139,6 +139,7 @@ const CategoriesScreen = () => {
   };
 
   return (
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
     <View style={styles.container}>
       <FlatList
         data={categories}
@@ -198,8 +199,8 @@ const CategoriesScreen = () => {
           </>
         }
       />
-
-      {/* Color picker overlay */}
+  
+      {/* 🔥 COLOR PICKER FLOATING ABOVE ALL */}
       {showPicker && (
         <View style={styles.absoluteOverlay}>
           <View style={styles.pickerDropdown}>
@@ -214,12 +215,14 @@ const CategoriesScreen = () => {
               >
                 <Text style={styles.pickerItemText}>{color.label}</Text>
                 <View style={getColorSquareStyle(color.value)} />
+
               </TouchableOpacity>
             ))}
           </View>
         </View>
       )}
     </View>
+  </ScrollView>
   );
 };
 

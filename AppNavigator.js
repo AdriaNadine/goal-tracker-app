@@ -7,6 +7,7 @@ import GoalQuestionsScreen from './screens/GoalQuestionsScreen';
 import GoalBreakdownScreen from './screens/GoalBreakdownScreen';
 import ProgressScreen from './screens/ProgressScreen';
 import PremiumScreen from './screens/PremiumScreen';
+import SignInScreen from './screens/SignInScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,6 +20,7 @@ export default function AppNavigator() {
       <Tab.Screen name="Steps" component={GoalBreakdownScreen} />
       <Tab.Screen name="Progress" component={ProgressScreen} />
       <Tab.Screen name="Premium" component={PremiumScreen} />
+      <Tab.Screen name="SignIn" component={SignInScreen} />
     </Tab.Navigator>
   );
 }
