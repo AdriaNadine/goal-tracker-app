@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const WelcomeScreen = () => {
@@ -11,19 +11,21 @@ const WelcomeScreen = () => {
       style={styles.container}
       resizeMode="contain"
     >
-      <View style={styles.overlay}>
-        <View style={styles.quoteContainer}>
-          <Text style={styles.quote} allowFontScaling={true}>“Start where you are.</Text>
-          <Text style={styles.quote} allowFontScaling={true}>Use what you have.</Text>
-          <Text style={styles.quote} allowFontScaling={true}>Do what you can.”</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent} bounces={false}>
+        <View style={styles.overlay}>
+          <View style={styles.quoteContainer}>
+            <Text style={styles.quote} allowFontScaling={true}>“Start where you are.</Text>
+            <Text style={styles.quote} allowFontScaling={true}>Use what you have.</Text>
+            <Text style={styles.quote} allowFontScaling={true}>Do what you can.”</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={() => navigation.navigate('Instruction')}
+          >
+            <Text style={styles.buttonText} allowFontScaling={true}>Get Started</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={() => navigation.navigate('Instruction')}
-        >
-          <Text style={styles.buttonText} allowFontScaling={true}>Get Started</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </ImageBackground>
   );
 };
@@ -64,6 +66,11 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 22,
     fontWeight: 'bold',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

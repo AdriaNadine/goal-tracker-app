@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, TextInput, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
-import { ScrollView } from 'react-native';
 import { collection, addDoc, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
 
 const goalTemplates = [
@@ -140,91 +139,96 @@ const CategoriesScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={categories}
-        keyExtractor={(item) => item.id}
-        renderItem={renderCategory}
-        contentContainerStyle={styles.listContent}
-        ListHeaderComponent={
-          <>
-            <Text style={styles.header}>Categories</Text>
-            <Text style={styles.instruction}>
-              Create a category to organize your goals. You can also use a template to get started quickly.
-            </Text>
-  
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="New category name"
-                value={newCategoryName}
-                onChangeText={setNewCategoryName}
-              />
-              <View style={styles.pickerContainer}>
-                <Text style={styles.pickerLabel}>Select Color:</Text>
-                <TouchableOpacity
-                  style={styles.pickerButton}
-                  onPress={() => setShowPicker(!showPicker)}
-                >
-                  <Text style={styles.pickerButtonText}>
-                    {colorOptions.find((color) => color.value === newCategoryColor)?.label || 'Pick a color'}
-                  </Text>
-                </TouchableOpacity>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <FlatList
+          data={categories}
+          keyExtractor={(item) => item.id}
+          renderItem={renderCategory}
+          contentContainerStyle={styles.listContent}
+          ListHeaderComponent={
+            <>
+              <Text style={styles.header}>Categories</Text>
+              <Text style={styles.instruction}>
+                Create a category to organize your goals. You can also use a template to get started quickly.
+              </Text>
+    
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="New category name"
+                  value={newCategoryName}
+                  onChangeText={setNewCategoryName}
+                />
+                <View style={styles.pickerContainer}>
+                  <Text style={styles.pickerLabel}>Select Color:</Text>
+                  <TouchableOpacity
+                    style={styles.pickerButton}
+                    onPress={() => setShowPicker(!showPicker)}
+                  >
+                    <Text style={styles.pickerButtonText}>
+                      {colorOptions.find((color) => color.value === newCategoryColor)?.label || 'Pick a color'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-  
-            <TouchableOpacity style={styles.addButton} onPress={addCategory}>
-              <Text style={styles.addButtonText}>Add Category</Text>
-            </TouchableOpacity>
-  
-            {loading && (
-              <Text style={{ textAlign: 'center', marginVertical: 20 }}>Loading categories...</Text>
-            )}
-          </>
-        }
-        ListEmptyComponent={
-          !loading && <Text style={styles.emptyText}>No categories yet.</Text>
-        }
-        ListFooterComponent={
-          <>
-            <Text style={styles.sectionTitle}>Goal Templates</Text>
-            <FlatList
-              data={goalTemplates}
-              keyExtractor={(item) => item.name}
-              renderItem={renderTemplate}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.templateList}
-            />
-          </>
-        }
-      />
-  
-      {/* 🔥 COLOR PICKER FLOATING ABOVE ALL */}
-      {showPicker && (
-        <View style={styles.absoluteOverlay}>
-          <View style={styles.pickerDropdown}>
-            {colorOptions.map(color => (
-              <TouchableOpacity
-                key={color.value}
-                style={styles.pickerItem}
-                onPress={() => {
-                  setNewCategoryColor(color.value);
-                  setShowPicker(false);
-                }}
-              >
-                <Text style={styles.pickerItemText}>{color.label}</Text>
-                <View style={getColorSquareStyle(color.value)} />
+    
+              <TouchableOpacity style={styles.addButton} onPress={addCategory}>
+                <Text style={styles.addButtonText}>Add Category</Text>
               </TouchableOpacity>
-            ))}
+    
+              {loading && (
+                <Text style={{ textAlign: 'center', marginVertical: 20 }}>Loading categories...</Text>
+              )}
+            </>
+          }
+          ListEmptyComponent={
+            !loading && <Text style={styles.emptyText}>No categories yet.</Text>
+          }
+          ListFooterComponent={
+            <>
+              <Text style={styles.sectionTitle}>Goal Templates</Text>
+              <FlatList
+                data={goalTemplates}
+                keyExtractor={(item) => item.name}
+                renderItem={renderTemplate}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.templateList}
+              />
+            </>
+          }
+        />
+    
+        {/* 🔥 COLOR PICKER FLOATING ABOVE ALL */}
+        {showPicker && (
+          <View style={styles.absoluteOverlay}>
+            <View style={styles.pickerDropdown}>
+              {colorOptions.map(color => (
+                <TouchableOpacity
+                  key={color.value}
+                  style={styles.pickerItem}
+                  onPress={() => {
+                    setNewCategoryColor(color.value);
+                    setShowPicker(false);
+                  }}
+                >
+                  <Text style={styles.pickerItemText}>{color.label}</Text>
+                  <View style={getColorSquareStyle(color.value)} />
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
-        </View>
-      )}
-    </View>
+        )}
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     paddingHorizontal: 20,

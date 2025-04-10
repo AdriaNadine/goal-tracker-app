@@ -4,8 +4,8 @@ import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/nativ
 import { auth, db } from '../config/firebase';
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import XPConfetti from '../utils/xp';
-import ConfettiCannon from 'react-native-confetti-cannon';
+// import XPConfetti from '../utils/xp';
+// import ConfettiCannon from 'react-native-confetti-cannon';
 
 const ProgressScreen = () => {
   const navigation = useNavigation();
@@ -14,7 +14,7 @@ const ProgressScreen = () => {
   const [steps, setSteps] = useState([]);
   const [sortType, setSortType] = useState('default');
   const [error, setError] = useState(null);
-  const [showConfetti, setShowConfetti] = useState(false);
+  // const [showConfetti, setShowConfetti] = useState(false);
   const [currentXP, setCurrentXP] = useState(0);
 
   const fetchData = async () => {
@@ -93,8 +93,8 @@ const ProgressScreen = () => {
           Alert.alert("Step Completed", `You earned 10 XP! Total XP: ${xp}`);
 
           if (xp % 100 === 0) {
-            setShowConfetti(true);
-            setTimeout(() => setShowConfetti(false), 4000);
+       //     setShowConfetti(true);
+     //       setTimeout(() => setShowConfetti(false), 4000);
           }
         } catch (err) {
           console.error('Error updating XP:', err);
@@ -216,7 +216,7 @@ const ProgressScreen = () => {
 
   return (
     <View style={styles.container}>
-      {showConfetti && <ConfettiCannon count={80} origin={{x: -10, y: 0}} />}
+     // {showConfetti && <ConfettiCannon count={80} origin={{x: -10, y: 0}} />}
       <Text allowFontScaling={true} style={styles.header}>Progress Overview</Text>
       {error && <Text allowFontScaling={true} style={styles.errorText}>Error: {error}</Text>}
       <View style={styles.sortContainer}>
@@ -239,7 +239,7 @@ const ProgressScreen = () => {
         renderItem={renderItem}
         ListEmptyComponent={<Text allowFontScaling={true} style={styles.emptyText}>No goals or steps yet.</Text>}
       />
-      <XPConfetti currentXP={currentXP} />
+     // <XPConfetti currentXP={currentXP} />
       <TouchableOpacity
         style={styles.navButton}
         onPress={() => navigation.navigate('Dashboard')}

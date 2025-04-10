@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, TextInput, ScrollView } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
 import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
@@ -197,76 +197,82 @@ const GoalBreakdownScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.header, { color: category?.color || '#000000' }]} allowFontScaling={true}>
-        Break Down Your Goal: {answers?.what || 'No goal'}
-      </Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={[styles.header, { color: category?.color || '#000000' }]} allowFontScaling={true}>
+          Break Down Your Goal: {answers?.what || 'No goal'}
+        </Text>
 
-      <Text style={styles.label} allowFontScaling={true}>Step Description:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter step description"
-        value={stepText}
-        onChangeText={setStepText}
-      />
+        <Text style={styles.label} allowFontScaling={true}>Step Description:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter step description"
+          value={stepText}
+          onChangeText={setStepText}
+        />
 
-      <Text style={styles.label} allowFontScaling={true}>Priority:</Text>
-      <TouchableOpacity
-        style={styles.priorityButton}
-        onPress={() => setShowPriorityPicker(!showPriorityPicker)}
-      >
-        <Text style={styles.priorityButtonText} allowFontScaling={true}>{urgency}</Text>
-      </TouchableOpacity>
-      {showPriorityPicker && (
-        <View style={styles.priorityDropdown}>
-          {priorityOptions.map((option) => (
-            <TouchableOpacity
-              key={option.value}
-              style={styles.priorityItem}
-              onPress={() => {
-                setUrgency(option.value);
-                setShowPriorityPicker(false);
-              }}
-            >
-              <Text style={styles.priorityItemText} allowFontScaling={true}>{option.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
+        <Text style={styles.label} allowFontScaling={true}>Priority:</Text>
+        <TouchableOpacity
+          style={styles.priorityButton}
+          onPress={() => setShowPriorityPicker(!showPriorityPicker)}
+        >
+          <Text style={styles.priorityButtonText} allowFontScaling={true}>{urgency}</Text>
+        </TouchableOpacity>
+        {showPriorityPicker && (
+          <View style={styles.priorityDropdown}>
+            {priorityOptions.map((option) => (
+              <TouchableOpacity
+                key={option.value}
+                style={styles.priorityItem}
+                onPress={() => {
+                  setUrgency(option.value);
+                  setShowPriorityPicker(false);
+                }}
+              >
+                <Text style={styles.priorityItemText} allowFontScaling={true}>{option.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
-      <Text style={styles.label} allowFontScaling={true}>Deadline:</Text>
-      <TouchableOpacity style={styles.input} onPress={showDatePicker}>
-        <Text style={{ fontSize: 16 }}>{deadline || 'Select a date'}</Text>
-      </TouchableOpacity>
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleDateConfirm}
-        onCancel={hideDatePicker}
-      />
+        <Text style={styles.label} allowFontScaling={true}>Deadline:</Text>
+        <TouchableOpacity style={styles.input} onPress={showDatePicker}>
+          <Text style={{ fontSize: 16 }}>{deadline || 'Select a date'}</Text>
+        </TouchableOpacity>
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleDateConfirm}
+          onCancel={hideDatePicker}
+        />
 
-      <TouchableOpacity style={styles.addButton} onPress={addOrUpdateStep}>
-        <Text style={styles.addButtonText} allowFontScaling={true}>{editingStepId ? 'Update Step' : 'Add Step'}</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.addButton} onPress={addOrUpdateStep}>
+          <Text style={styles.addButtonText} allowFontScaling={true}>{editingStepId ? 'Update Step' : 'Add Step'}</Text>
+        </TouchableOpacity>
 
-      <FlatList
-        data={steps}
-        keyExtractor={(item) => item.id}
-        renderItem={renderStepItem}
-        ListEmptyComponent={<Text style={styles.emptyText} allowFontScaling={true}>No steps added yet.</Text>}
-      />
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Categories')}>
-  <Text style={styles.backButtonText} allowFontScaling={true}>← Back to Categories</Text>
-</TouchableOpacity>
+        <FlatList
+          data={steps}
+          keyExtractor={(item) => item.id}
+          renderItem={renderStepItem}
+          ListEmptyComponent={<Text style={styles.emptyText} allowFontScaling={true}>No steps added yet.</Text>}
+        />
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Categories')}>
+          <Text style={styles.backButtonText} allowFontScaling={true}>← Back to Categories</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSaveSteps}>
-        <Text style={styles.saveButtonText} allowFontScaling={true}>Done</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSaveSteps}>
+          <Text style={styles.saveButtonText} allowFontScaling={true}>Done</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 30,
+  },
   container: {
     flex: 1,
     padding: 20,

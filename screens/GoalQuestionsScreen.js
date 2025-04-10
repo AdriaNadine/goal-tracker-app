@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { db, auth } from '../config/firebase';
 import { scheduleNotification } from '../utils/notifications';
@@ -123,79 +123,81 @@ const GoalQuestionsScreen = () => {
       console.error('Error saving goals:', error);
       Alert.alert('Error', `Failed to save goals: ${error.message}`);
     }
-      };
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.header, { color: category.color }]} allowFontScaling={true}>
-        {goalToEdit ? 'Edit Goal' : 'Answer the Following Questions:'}
-      </Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={[styles.header, { color: category.color }]} allowFontScaling={true}>
+          {goalToEdit ? 'Edit Goal' : 'Answer the Following Questions:'}
+        </Text>
 
-      <TouchableOpacity
-        style={styles.navButton}
-        onPress={() => navigation.navigate('Categories', { screen: 'Categories' })}
-      >
-        <Text style={styles.navButtonText} allowFontScaling={true}>Back to Categories</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navButton}
+          onPress={() => navigation.navigate('Categories', { screen: 'Categories' })}
+        >
+          <Text style={styles.navButtonText} allowFontScaling={true}>Back to Categories</Text>
+        </TouchableOpacity>
 
-      <Text style={styles.question} allowFontScaling={true}>What is your goal?</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your goal..."
-        value={answers.what}
-        onChangeText={(text) => handleAnswerChange('what', text)}
-      />
-
-      <Text style={styles.question} allowFontScaling={true}>Why do you want to achieve this goal?</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your reason..."
-        value={answers.why}
-        onChangeText={(text) => handleAnswerChange('why', text)}
-      />
-
-      <Text style={styles.question} allowFontScaling={true}>When will you achieve this goal?</Text>
-      <TouchableOpacity
-        style={styles.input}
-        onPress={() => setShowDatePicker(true)}
-      >
-        <Text allowFontScaling={true}>{answers.when ? answers.when : 'Select a date'}</Text>
-      </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          value={answers.when ? new Date(answers.when) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (selectedDate) {
-              const isoDate = selectedDate.toISOString().split('T')[0];
-              handleAnswerChange('when', isoDate);
-            }
-          }}
+        <Text style={styles.question} allowFontScaling={true}>What is your goal?</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your goal..."
+          value={answers.what}
+          onChangeText={(text) => handleAnswerChange('what', text)}
         />
-      )}
 
-      <Text style={styles.question} allowFontScaling={true}>Where will you work on this goal?</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your location..."
-        value={answers.where}
-        onChangeText={(text) => handleAnswerChange('where', text)}
-      />
+        <Text style={styles.question} allowFontScaling={true}>Why do you want to achieve this goal?</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your reason..."
+          value={answers.why}
+          onChangeText={(text) => handleAnswerChange('why', text)}
+        />
 
-      <Text style={styles.question} allowFontScaling={true}>Who will support you in this goal?</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter names or resources..."
-        value={answers.who}
-        onChangeText={(text) => handleAnswerChange('who', text)}
-      />
+        <Text style={styles.question} allowFontScaling={true}>When will you achieve this goal?</Text>
+        <TouchableOpacity
+          style={styles.input}
+          onPress={() => setShowDatePicker(true)}
+        >
+          <Text allowFontScaling={true}>{answers.when ? answers.when : 'Select a date'}</Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+          <DateTimePicker
+            value={answers.when ? new Date(answers.when) : new Date()}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                const isoDate = selectedDate.toISOString().split('T')[0];
+                handleAnswerChange('when', isoDate);
+              }
+            }}
+          />
+        )}
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText} allowFontScaling={true}>Submit</Text>
-      </TouchableOpacity>
-    </View>
+        <Text style={styles.question} allowFontScaling={true}>Where will you work on this goal?</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your location..."
+          value={answers.where}
+          onChangeText={(text) => handleAnswerChange('where', text)}
+        />
+
+        <Text style={styles.question} allowFontScaling={true}>Who will support you in this goal?</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter names or resources..."
+          value={answers.who}
+          onChangeText={(text) => handleAnswerChange('who', text)}
+        />
+
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText} allowFontScaling={true}>Submit</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -204,6 +206,10 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#fff',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 30,
   },
   header: {
     fontSize: 22,

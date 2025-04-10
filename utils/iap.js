@@ -52,12 +52,23 @@ export const unlockPremium = async () => {
   try {
     await AsyncStorage.setItem('isPremiumUser', 'true');
     console.log('✨ Premium unlocked and stored in AsyncStorage');
+
     const auth = getAuth(app);
     const user = auth.currentUser;
+
+    console.log('🔐 Checking if user is authenticated before saving to Firestore');
+    console.log('🔐 Firebase user:', user ? user.uid : 'NO USER');
+
     if (user) {
       const db = getFirestore(app);
-      await setDoc(doc(db, 'users', user.uid), { isPremium: true }, { merge: true });
-      console.log('✨ Premium status saved to Firestore');
+      try {
+        await setDoc(doc(db, 'users', user.uid), { isPremium: true }, { merge: true });
+        console.log('✨ Premium status saved to Firestore');
+      } catch (error) {
+        console.error('❌ Failed to write premium to Firestore:', error);
+      }
+    } else {
+      console.warn('⚠️ No user logged in — cannot store premium status in Firestore.');
     }
   } catch (error) {
     console.error('Failed to unlock premium:', error);
