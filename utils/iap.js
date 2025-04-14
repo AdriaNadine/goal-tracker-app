@@ -50,25 +50,26 @@ export const initPurchaseListener = (onUnlock) => {
 
 export const unlockPremium = async () => {
   try {
-    await AsyncStorage.setItem('isPremiumUser', 'true');
+    await AsyncStorage.setItem('isPremium', 'true');
     console.log('✨ Premium unlocked and stored in AsyncStorage');
 
     const auth = getAuth(app);
     const user = auth.currentUser;
 
-    console.log('🔐 Checking if user is authenticated before saving to Firestore');
-    console.log('🔐 Firebase user:', user ? user.uid : 'NO USER');
+    if (!user) {
+      console.warn('⚠️ No user is logged in. Cannot store premium status in Firestore.');
+      return;
+    }
 
-    if (user) {
-      const db = getFirestore(app);
-      try {
-        await setDoc(doc(db, 'users', user.uid), { isPremium: true }, { merge: true });
-        console.log('✨ Premium status saved to Firestore');
-      } catch (error) {
-        console.error('❌ Failed to write premium to Firestore:', error);
-      }
-    } else {
-      console.warn('⚠️ No user logged in — cannot store premium status in Firestore.');
+    const db = getFirestore(app);
+    const userRef = doc(db, 'users', user.uid);
+    console.log('📄 Writing premium status to Firestore for UID:', user.uid);
+
+    try {
+      await setDoc(userRef, { isPremium: true }, { merge: true });
+      console.log('✅ Premium status saved to Firestore');
+    } catch (error) {
+      console.error('❌ Firestore write failed:', error);
     }
   } catch (error) {
     console.error('Failed to unlock premium:', error);

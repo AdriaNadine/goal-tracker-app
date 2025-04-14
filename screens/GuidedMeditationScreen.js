@@ -142,7 +142,7 @@ const GuidedMeditationScreen = () => {
       <Text style={styles.header} allowFontScaling={true}>Guided Meditation</Text>
   
       {/* Cancel and Skip Buttons */}
-      <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.navigate('Dashboard')}>
+      <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.navigate('MainTabs', { screen: 'Dashboard' })}>
         <Text style={styles.skipText}>Cancel</Text>
       </TouchableOpacity>
   
@@ -157,7 +157,7 @@ const GuidedMeditationScreen = () => {
         console.warn('⚠️ Failed to stop sound:', err);
       }
     }
-    navigation.navigate('Categories');
+    navigation.navigate('MainTabs', { screen: 'Categories' });
   }}
 >
   <Text style={styles.skipText}>Skip</Text>

@@ -21,25 +21,22 @@ const usePremiumStatus = () => {
           if (userSnap.exists()) {
             const premium = userSnap.data().isPremium === true;
             setIsPremium(premium);
-            await AsyncStorage.setItem('hasPremium', premium.toString());
+            await AsyncStorage.setItem('isPremium', premium.toString());
             return;
           }
         }
-      
 
-        // fallback to local storage
-        const value = await AsyncStorage.getItem('hasPremium');
+        const value = await AsyncStorage.getItem('isPremium');
         setIsPremium(value === 'true');
       } catch (error) {
         console.error('Error checking premium status:', error);
-        const value = await AsyncStorage.getItem('hasPremium');
+        const value = await AsyncStorage.getItem('isPremium');
         setIsPremium(value === 'true');
       }
     };
 
     check();
   }, []);
-  
 
   return isPremium;
 };
@@ -57,15 +54,15 @@ export const recheckPremiumStatus = async (setIsPremium) => {
       if (userSnap.exists()) {
         const premium = userSnap.data().isPremium === true;
         setIsPremium(premium);
-        await AsyncStorage.setItem('hasPremium', premium.toString());
+        await AsyncStorage.setItem('isPremium', premium.toString());
         return;
       }
     }
 
-    const value = await AsyncStorage.getItem('hasPremium');
+    const value = await AsyncStorage.getItem('isPremium');
     setIsPremium(value === 'true');
   } catch (error) {
-    const value = await AsyncStorage.getItem('hasPremium');
+    const value = await AsyncStorage.getItem('isPremium');
     setIsPremium(value === 'true');
   }
 };

@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, TextInput } 
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
 import { collection, addDoc, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
+import usePremiumStatus from '../hooks/usePremiumStatus';
 
 const goalTemplates = [
   { name: 'Run 5K', category: 'Fitness', color: '#00FF00', answers: { what: 'Run a 5K', why: 'Improve health' } },
@@ -28,6 +29,7 @@ const CategoriesScreen = () => {
   const [newCategoryColor, setNewCategoryColor] = useState('#000000');
   const [showPicker, setShowPicker] = useState(false);
   const [loading, setLoading] = useState(false);
+  const isPremium = usePremiumStatus();
 
   useEffect(() => {
     fetchCategories();
@@ -64,7 +66,12 @@ const CategoriesScreen = () => {
       Alert.alert('Error', 'Please enter a category name.');
       return;
     }
-
+  
+    if (!isPremium && categories.length >= 1) {
+      Alert.alert('Upgrade Required', 'Free users can only create 1 category. Upgrade to Premium for unlimited categories.');
+      return;
+    }
+  
     try {
       await addDoc(collection(db, 'categories'), {
         name: newCategoryName,

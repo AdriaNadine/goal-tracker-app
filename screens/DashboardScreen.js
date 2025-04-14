@@ -21,7 +21,7 @@ const DashboardScreen = () => {
   const [goals, setGoals] = useState([]);
   const [steps, setSteps] = useState([]);
   const [quote, setQuote] = useState('');
-  const hasPremium = usePremiumStatus();
+  const isPremium = usePremiumStatus();
 
   const fetchData = async () => {
     if (auth.currentUser) {
@@ -86,7 +86,7 @@ const DashboardScreen = () => {
   };
 
   const handleEditGoal = async (goal) => {
-    if (!hasPremium && goals.length >= 3) {
+    if (!isPremium && goals.length >= 3)      {
       Alert.alert(
         'Limit Reached',
         'Free users can only create 3 goals. Upgrade to Goal Master for unlimited goals.'
@@ -94,7 +94,7 @@ const DashboardScreen = () => {
       return;
     }
 
-    if (!hasPremium && steps.length >= 5) {
+    if (!isPremium && steps.length >= 5)      {
       Alert.alert(
         'Limit Reached',
         'Free users can only create 5 steps. Upgrade to Goal Master for unlimited steps.'
@@ -126,7 +126,7 @@ const DashboardScreen = () => {
   };
 
   const handleCategoryPress = (categoryName) => {
-    if (!hasPremium && getCategorySummary().length >= 1) {
+    if (!isPremium && getCategorySummary().length >= 1)      {
       Alert.alert(
         'Limit Reached',
         'Free users can only have 1 category. Upgrade to Goal Master for unlimited access.'
@@ -226,7 +226,7 @@ const DashboardScreen = () => {
               ListEmptyComponent={<Text style={styles.emptyText} allowFontScaling={true}>No goals yet.</Text>}
               scrollEnabled={false}
             />
-            {!hasPremium && (
+            {!isPremium && (
               <TouchableOpacity
                 style={[styles.button, { backgroundColor: '#8E44AD' }]}
                 onPress={() => navigation.navigate('Premium')}
@@ -234,7 +234,7 @@ const DashboardScreen = () => {
                 <Text style={styles.buttonText} allowFontScaling={true}>Unlock Premium Features</Text>
               </TouchableOpacity>
             )}
-            {!hasPremium && (
+            {!isPremium && (
               <>
                 {(getCategorySummary().length >= 1 || goals.length >= 3 || steps.length >= 5) && (
                   <Text style={{ fontSize: 14, color: 'red', marginBottom: 10, textAlign: 'center' }} allowFontScaling={true}>
@@ -249,7 +249,7 @@ const DashboardScreen = () => {
             )}
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate('Meditation')}
+              onPress={() => navigation.navigate('GuidedMeditation')}
             >
               <Text style={styles.buttonText} allowFontScaling={true}>Start Guided Meditation</Text>
             </TouchableOpacity>

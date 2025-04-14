@@ -10,6 +10,7 @@ import WelcomeScreen from './screens/WelcomeScreen';
 import SignInScreen from './screens/SignInScreen';
 import SignUpScreen from './screens/SignUpScreen';
 import MainTabs from './screens/MainTabs';
+import GuidedMeditationScreen from './screens/GuidedMeditationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ export default function AppNavigator() {
       <Stack.Screen name="SignIn" component={SignInScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
       <Stack.Screen name="MainTabs" component={MainTabs} />
+      <Stack.Screen name="GuidedMeditation" component={GuidedMeditationScreen} />
     </Stack.Navigator>
   );
 }

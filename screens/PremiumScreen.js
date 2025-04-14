@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
+import { getAuth } from 'firebase/auth';
 import * as InAppPurchases from 'expo-in-app-purchases';
 import * as Notifications from 'expo-notifications';
-import { initPurchaseListener, unlockPremium } from '../utils/iap'; // Updated import
-import { recheckPremiumStatus } from '../hooks/usePremiumStatus'; // Import recheckPremiumStatus
+import { initPurchaseListener, unlockPremium } from '../utils/iap';
+import { recheckPremiumStatus } from '../hooks/usePremiumStatus';
 
-const PRODUCT_ID = 'goal_master_unlock'; // ✅ Matches App Store product
-
-initPurchaseListener(async () => {
-  await unlockPremium();
-  await recheckPremiumStatus(() => {}); // placeholder, not used outside UI
-  Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
-});
+const PRODUCT_ID = 'goal_master_unlock';
 
 export default function PremiumScreen() {
   const [product, setProduct] = useState(null);
-  const [isPremium, setIsPremium] = useState(false); // Add local premium state
+  const [isPremium, setIsPremium] = useState(false);
 
-  // 🔔 Request user permission for notifications
+  // 🔔 Ask for notification permission
   const requestNotificationPermission = async () => {
     const { status } = await Notifications.getPermissionsAsync();
     if (status !== 'granted') {
@@ -28,7 +23,7 @@ export default function PremiumScreen() {
     }
   };
 
-  // 🧠 Fetch product info from Apple
+  // 🛒 Fetch IAP products
   const fetchProducts = async () => {
     try {
       const { responseCode, results } = await InAppPurchases.getProductsAsync([PRODUCT_ID]);
@@ -43,7 +38,7 @@ export default function PremiumScreen() {
     }
   };
 
-  // 💳 Purchase the product
+  // 💳 Trigger purchase
   const handleBuy = async () => {
     if (product) {
       try {
@@ -57,12 +52,29 @@ export default function PremiumScreen() {
     }
   };
 
-  // 📡 Setup listeners + permissions safely
+  // 🚀 Setup IAP listener & initialization
   useEffect(() => {
     const init = async () => {
       try {
         await requestNotificationPermission();
         await InAppPurchases.connectAsync();
+
+        initPurchaseListener(async () => {
+          console.log("🛑 Purchase listener TRIGGERED");
+          const auth = getAuth();
+          const user = auth.currentUser;
+
+          if (!user) {
+            Alert.alert("Sign In Required", "Please sign in before unlocking premium features.");
+            console.warn("🚫 Purchase blocked — user not signed in.");
+            return;
+          }
+
+          await unlockPremium();
+          await recheckPremiumStatus(setIsPremium);
+          Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
+        });
+
         await fetchProducts();
       } catch (err) {
         console.warn("🔥 IAP init error:", err);
@@ -87,33 +99,31 @@ export default function PremiumScreen() {
         <Text style={styles.premiumBadge}>🌟 Premium Active</Text>
       )}
 
-      {!isPremium ? (
-        product && typeof product.price === 'string' ? (
-          <>
-            <Button title={`Buy for ${product.price}`} onPress={handleBuy} />
-            <Button
-              title="Restore Purchase"
-              onPress={async () => {
-                try {
-                  const history = await InAppPurchases.getPurchaseHistoryAsync();
-                  const unlocked = history.some(p => p.productId === PRODUCT_ID);
-                  if (unlocked) {
-                    await unlockPremium();
-                    await recheckPremiumStatus(setIsPremium);
-                    Alert.alert('✅ Purchase restored!', 'Premium access reinstated.');
-                  } else {
-                    Alert.alert('❌ No previous purchase found.');
-                  }
-                } catch (err) {
-                  console.warn('⚠️ Error restoring purchase:', err);
-                  Alert.alert('Error', 'Could not restore purchase.');
+      {!isPremium && product && typeof product.price === 'string' ? (
+        <>
+          <Button title={`Buy for ${product.price}`} onPress={handleBuy} />
+          <Button
+            title="Restore Purchase"
+            onPress={async () => {
+              try {
+                const history = await InAppPurchases.getPurchaseHistoryAsync();
+                const unlocked = Array.isArray(history) && history.some(p => p.productId === PRODUCT_ID);
+                if (unlocked) {
+                  await unlockPremium();
+                  await recheckPremiumStatus(setIsPremium);
+                  Alert.alert('✅ Purchase restored!', 'Premium access reinstated.');
+                } else {
+                  Alert.alert('❌ No previous purchase found.');
                 }
-              }}
-            />
-          </>
-        ) : (
-          <Text style={styles.errorMessage}>⚠️ Product is currently unavailable.</Text>
-        )
+              } catch (err) {
+                console.warn('⚠️ Error restoring purchase:', err);
+                Alert.alert('Error', 'Could not restore purchase.');
+              }
+            }}
+          />
+        </>
+      ) : !isPremium ? (
+        <Text style={styles.errorMessage}>⚠️ Product is currently unavailable.</Text>
       ) : null}
     </View>
   );

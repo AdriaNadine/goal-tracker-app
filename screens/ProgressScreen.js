@@ -230,7 +230,7 @@ const ProgressScreen = () => {
       />
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => navigation.navigate('Dashboard')}
+        onPress={() => navigation.navigate('MainTabs', { screen: 'Dashboard' })}
       >
         <Text allowFontScaling={true} style={styles.navButtonText}>Back to Dashboard</Text>
       </TouchableOpacity>

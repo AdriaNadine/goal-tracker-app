@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert, TextInput 
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
 import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import usePremiumStatus from '../hooks/usePremiumStatus';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as Haptics from 'expo-haptics';
 
@@ -17,6 +18,7 @@ const GoalBreakdownScreen = () => {
   const [editingStepId, setEditingStepId] = useState(null);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const isPremium = usePremiumStatus();
 
   const showDatePicker = () => setDatePickerVisibility(true);
   const hideDatePicker = () => setDatePickerVisibility(false);
@@ -68,11 +70,17 @@ const GoalBreakdownScreen = () => {
       Alert.alert('Error', 'Please enter a step description.');
       return;
     }
+  
     if (!goalId) {
       Alert.alert('Error', 'Steps must be attached to a goal.');
       return;
     }
-
+  
+    if (!isPremium && steps.length >= 5) {
+      Alert.alert('Upgrade Required', 'Free users can only add up to 5 steps per goal. Upgrade to Premium for unlimited steps.');
+      return;
+    }
+  
     const stepData = {
       userId: auth.currentUser.uid,
       goalId: goalId,
@@ -85,7 +93,7 @@ const GoalBreakdownScreen = () => {
       order: editingStepId ? steps.find(s => s.id === editingStepId)?.order : steps.length,
       createdAt: new Date().toISOString(),
     };
-
+  
     try {
       if (editingStepId) {
         const stepRef = doc(db, 'steps', editingStepId);
@@ -253,9 +261,13 @@ const GoalBreakdownScreen = () => {
         </TouchableOpacity>
 
         {/* render each step manually instead of FlatList */}
-        {steps.map((item, index) => renderStepItem({ item, index }))}
+        {steps.map((item, index) => (
+  <View key={item.id}>
+    {renderStepItem({ item, index })}
+  </View>
+))}
 
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Categories')}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('MainTabs', { screen: 'Categories' })}>
           <Text style={styles.backButtonText} allowFontScaling={true}>← Back to Categories</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.saveButton} onPress={handleSaveSteps}>
