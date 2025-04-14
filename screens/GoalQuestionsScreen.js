@@ -126,8 +126,8 @@ const GoalsScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
         <Text style={[styles.header, { color: category.color }]} allowFontScaling={true}>
           {goalToEdit ? 'Edit Goal' : 'Answer the Following Questions:'}
         </Text>
@@ -196,8 +196,8 @@ const GoalsScreen = () => {
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText} allowFontScaling={true}>Submit</Text>
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -12,7 +10,7 @@ export default function SignInScreen({ navigation }) {
   const handleSignIn = async () => {
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      // App.js will automatically route after auth state updates
+      navigation.navigate('MainTabs', { screen: 'Dashboard' });
     } catch (error) {
       console.error('Login failed:', error.message);
       Alert.alert('Login Error', error.message);

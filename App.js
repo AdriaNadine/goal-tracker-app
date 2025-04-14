@@ -68,7 +68,7 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer style={{ paddingTop: 40 }}>
+    <NavigationContainer>
       <AppNavigator user={user} />
     </NavigationContainer>
   );

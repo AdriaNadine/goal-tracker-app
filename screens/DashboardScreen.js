@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
 import { signOut } from 'firebase/auth';
@@ -76,7 +76,9 @@ const DashboardScreen = () => {
       setUserEmail('');
       setGoals([]);
       setSteps([]);
-      navigation.navigate('SignIn');
+      if (navigation && navigation.navigate) {
+        navigation.navigate('Welcome');
+      }
     } catch (error) {
       console.error('Logout error:', error);
       Alert.alert('Error', 'Failed to log out.');
@@ -200,65 +202,67 @@ const DashboardScreen = () => {
   );
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
     <View style={styles.container}>
-      <Text style={styles.header} allowFontScaling={true}>Dashboard</Text>
-      <View style={styles.tabContainer}>
-
-      </View>
-      <Text style={styles.quote} allowFontScaling={true}>{`Today’s Motivation: "${quote}"`}</Text>
-      <Text style={styles.userInfo} allowFontScaling={true}>Welcome, {userEmail}!</Text>
-      <Text style={styles.sectionTitle} allowFontScaling={true}>Your Categories</Text>
       <FlatList
+        ListHeaderComponent={
+          <>
+            <Text style={styles.header} allowFontScaling={true}>Dashboard</Text>
+            <Text style={styles.quote} allowFontScaling={true}>{`Today’s Motivation: "${quote}"`}</Text>
+            <Text style={styles.userInfo} allowFontScaling={true}>Welcome, {userEmail}!</Text>
+            <Text style={styles.sectionTitle} allowFontScaling={true}>Your Categories</Text>
+          </>
+        }
         data={getCategorySummary()}
         keyExtractor={(item) => item.name}
         renderItem={renderCategoryItem}
         ListEmptyComponent={<Text style={styles.emptyText} allowFontScaling={true}>No goals yet. Start by setting a goal!</Text>}
-        style={styles.categoryList}
+        ListFooterComponent={
+          <>
+            <Text style={styles.sectionTitle} allowFontScaling={true}>Your Goals</Text>
+            <FlatList
+              data={goals}
+              keyExtractor={(item) => item.id}
+              renderItem={renderGoalItem}
+              ListEmptyComponent={<Text style={styles.emptyText} allowFontScaling={true}>No goals yet.</Text>}
+              scrollEnabled={false}
+            />
+            {!hasPremium && (
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: '#8E44AD' }]}
+                onPress={() => navigation.navigate('Premium')}
+              >
+                <Text style={styles.buttonText} allowFontScaling={true}>Unlock Premium Features</Text>
+              </TouchableOpacity>
+            )}
+            {!hasPremium && (
+              <>
+                {(getCategorySummary().length >= 1 || goals.length >= 3 || steps.length >= 5) && (
+                  <Text style={{ fontSize: 14, color: 'red', marginBottom: 10, textAlign: 'center' }} allowFontScaling={true}>
+                    🔒 Free plan limit reached:
+                    {getCategorySummary().length >= 1 ? "\n- 1 category" : ""}
+                    {goals.length >= 3 ? "\n- 3 goals" : ""}
+                    {steps.length >= 5 ? "\n- 5 steps" : ""}
+                    {"\nUpgrade to Goal Master to unlock unlimited tracking."}
+                  </Text>
+                )}
+              </>
+            )}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('Meditation')}
+            >
+              <Text style={styles.buttonText} allowFontScaling={true}>Start Guided Meditation</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={handleLogout}
+            >
+              <Text style={styles.logoutText} allowFontScaling={true}>Logout</Text>
+            </TouchableOpacity>
+          </>
+        }
       />
-      <Text style={styles.sectionTitle} allowFontScaling={true}>Your Goals</Text>
-      <FlatList
-        data={goals}
-        keyExtractor={(item) => item.id}
-        renderItem={renderGoalItem}
-        ListEmptyComponent={<Text style={styles.emptyText} allowFontScaling={true}>No goals yet.</Text>}
-        style={styles.goalList}
-      />
-      {!hasPremium && (
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: '#8E44AD' }]}
-          onPress={() => navigation.navigate('Premium')}
-        >
-          <Text style={styles.buttonText} allowFontScaling={true}>Unlock Premium Features</Text>
-        </TouchableOpacity>
-      )}
-      {!hasPremium && (
-        <>
-          {(getCategorySummary().length >= 1 || goals.length >= 3 || steps.length >= 5) && (
-            <Text style={{ fontSize: 14, color: 'red', marginBottom: 10, textAlign: 'center' }} allowFontScaling={true}>
-              🔒 Free plan limit reached:
-              {getCategorySummary().length >= 1 ? "\n- 1 category" : ""}
-              {goals.length >= 3 ? "\n- 3 goals" : ""}
-              {steps.length >= 5 ? "\n- 5 steps" : ""}
-              {"\nUpgrade to Goal Master to unlock unlimited tracking."}
-            </Text>
-          )}
-        </>
-      )}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('Meditation')}  // Ensure it navigates correctly to GuidedMeditation screen
-      >
-        <Text style={styles.buttonText} allowFontScaling={true}>Start Guided Meditation</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={handleLogout}
-      >
-        <Text style={styles.logoutText} allowFontScaling={true}>Logout</Text>
-      </TouchableOpacity>
     </View>
-  </ScrollView>
   );
 };
 
@@ -266,8 +270,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 80,
+    paddingTop: 20,
+    paddingBottom: 50,
     backgroundColor: '#f5f5f5',
   },
   scrollContainer: {
@@ -286,11 +290,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontStyle: 'italic',
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#007AAA',
     backgroundColor: '#E6F0FF',
     borderRadius: 10,
     padding: 20,
-    marginVertical: 20,
+    marginVertical: 10,
     textAlign: 'center',
     borderWidth: 1,
     borderColor: '#007AFF',
@@ -301,24 +305,24 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   userInfo: {
-    fontSize: 18,
-    marginBottom: 20,
+    fontSize: 15,
+    marginBottom: 10,
     color: '#333',
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 5,
     color: '#007AFF',
   },
   categoryList: {
     flex: 0.5,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   categoryItem: {
-    padding: 15,
+    padding: 5,
     borderWidth: 2,
-    borderRadius: 5,
+    borderRadius: 15,
     marginBottom: 10,
     backgroundColor: '#fff',
   },
@@ -346,8 +350,8 @@ const styles = StyleSheet.create({
     flex: 0.5,
   },
   goalItem: {
-    padding: 15,
-    borderWidth: 1,
+    padding: 10,
+    borderWidth: 5,
     borderRadius: 5,
     marginBottom: 10,
     backgroundColor: '#fff',

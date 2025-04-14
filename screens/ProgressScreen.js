@@ -4,8 +4,6 @@ import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/nativ
 import { auth, db } from '../config/firebase';
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import XPConfetti from '../utils/xp';
-// import ConfettiCannon from 'react-native-confetti-cannon';
 
 const ProgressScreen = () => {
   const navigation = useNavigation();
@@ -14,7 +12,6 @@ const ProgressScreen = () => {
   const [steps, setSteps] = useState([]);
   const [sortType, setSortType] = useState('default');
   const [error, setError] = useState(null);
-  const [showConfetti, setShowConfetti] = useState(false);
   const [currentXP, setCurrentXP] = useState(0);
 
   const fetchData = async () => {
@@ -69,7 +66,6 @@ const ProgressScreen = () => {
     }, [])
   );
 
-  // TODO: Consider moving XP tracking to Firestore instead of AsyncStorage to support cross-device sync
   const toggleStepCompletion = async (stepId, currentStatus) => {
     try {
       const stepRef = doc(db, 'steps', stepId);
@@ -88,14 +84,8 @@ const ProgressScreen = () => {
           const storedXP = await AsyncStorage.getItem('userXP');
           let xp = storedXP ? parseInt(storedXP, 10) : 0;
           xp += 10;
-          // TODO: Consider syncing XP to Firestore for cross-device tracking and persistence
           await AsyncStorage.setItem('userXP', xp.toString());
           Alert.alert("Step Completed", `You earned 10 XP! Total XP: ${xp}`);
-
-          if (xp % 100 === 0) {
-       //     setShowConfetti(true);
-     //       setTimeout(() => setShowConfetti(false), 4000);
-          }
         } catch (err) {
           console.error('Error updating XP:', err);
         }
@@ -216,7 +206,6 @@ const ProgressScreen = () => {
 
   return (
     <View style={styles.container}>
-     {/* {showConfetti && <ConfettiCannon count={80} origin={{x: -10, y: 0}} />} */}
       <Text allowFontScaling={true} style={styles.header}>Progress Overview</Text>
       {error && <Text allowFontScaling={true} style={styles.errorText}>Error: {error}</Text>}
       <View style={styles.sortContainer}>
@@ -239,7 +228,6 @@ const ProgressScreen = () => {
         renderItem={renderItem}
         ListEmptyComponent={<Text allowFontScaling={true} style={styles.emptyText}>No goals or steps yet.</Text>}
       />
-     {/* <XPConfetti currentXP={currentXP} /> */}
       <TouchableOpacity
         style={styles.navButton}
         onPress={() => navigation.navigate('Dashboard')}
@@ -288,7 +276,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,
-    borderWidth: 1,
+    borderWidth: 5,
     borderColor: '#ccc',
   },
   goalText: {

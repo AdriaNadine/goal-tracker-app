@@ -13,7 +13,7 @@ const SignUpScreen = () => {
   const handleSignUp = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email.trim(), password);
-      // Navigation will be handled automatically by App.js when auth state updates
+      navigation.navigate('MainTabs', { screen: 'Dashboard' });
     } catch (err) {
       setError(err.message);
     }
