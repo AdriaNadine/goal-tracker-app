@@ -17,9 +17,9 @@ const GoalsScreen = () => {
     what: '',
     why: '',
     when: '',
-    where: '',
-    who: '',
   });
+  const [reminderTime, setReminderTime] = useState('');
+  const [showReminderPicker, setShowReminderPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   useFocusEffect(
@@ -28,8 +28,6 @@ const GoalsScreen = () => {
         what: '',
         why: '',
         when: '',
-        where: '',
-        who: '',
       };
 
       if (goalToEdit) {
@@ -39,8 +37,6 @@ const GoalsScreen = () => {
           what: templateAnswers.what || '',
           why: templateAnswers.why || '',
           when: templateAnswers.when || '',
-          where: templateAnswers.where || '',
-          who: templateAnswers.who || '',
         };
       }
 
@@ -103,9 +99,18 @@ const GoalsScreen = () => {
           );
           await scheduleMotivationalReminder();
         }
+        if (reminderTime) {
+          await scheduleNotification(
+            {
+              id: `${goalId}-reminder`,
+              title: 'Reminder for your goal',
+              body: `Don't forget to work on: ${answers.what}`,
+            },
+            new Date(reminderTime)
+          );
+        }
       }
-      // TODO: Consider using 'why', 'where', and 'who' answers to enrich goal reflection features or dashboard insights.
-      // For example: create a reflection summary, show insights on goal details screen, or track motivation over time.
+      // TODO: Consider using 'why' answers to enrich goal reflection features or dashboard insights.
       Alert.alert(
         'Success',
         'Your goal has been saved!',
@@ -177,21 +182,31 @@ const GoalsScreen = () => {
           />
         )}
 
-        <Text style={styles.question} allowFontScaling={true}>Where will you work on this goal?</Text>
-        <TextInput
+        <Text style={styles.question} allowFontScaling={true}>
+          When do you want to be reminded about your goal?
+        </Text>
+        <TouchableOpacity
           style={styles.input}
-          placeholder="Enter your location..."
-          value={answers.where}
-          onChangeText={(text) => handleAnswerChange('where', text)}
-        />
-
-        <Text style={styles.question} allowFontScaling={true}>Who will support you in this goal?</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter names or resources..."
-          value={answers.who}
-          onChangeText={(text) => handleAnswerChange('who', text)}
-        />
+          onPress={() => setShowReminderPicker(true)}
+        >
+          <Text allowFontScaling={true}>
+            {reminderTime ? reminderTime : 'Select reminder date & time'}
+          </Text>
+        </TouchableOpacity>
+        {showReminderPicker && (
+          <DateTimePicker
+            value={reminderTime ? new Date(reminderTime) : new Date()}
+            mode="datetime"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowReminderPicker(false);
+              if (selectedDate) {
+                const isoDateTime = selectedDate.toISOString();
+                setReminderTime(isoDateTime);
+              }
+            }}
+          />
+        )}
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText} allowFontScaling={true}>Submit</Text>
@@ -205,6 +220,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    paddingTop: 60,
     backgroundColor: '#fff',
   },
   scrollContainer: {

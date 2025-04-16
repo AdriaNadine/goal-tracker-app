@@ -242,6 +242,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    paddingTop: 60,
     backgroundColor: '#f5f5f5',
   },
   header: {
@@ -260,6 +261,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 20,
+    marginRight: 20,
+    padding: 20,
   },
   sortButton: {
     backgroundColor: '#8E8E93',

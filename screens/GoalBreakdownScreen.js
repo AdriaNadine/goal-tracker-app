@@ -6,6 +6,7 @@ import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, w
 import usePremiumStatus from '../hooks/usePremiumStatus';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as Haptics from 'expo-haptics';
+import { scheduleNotification } from '../utils/notifications';
 
 const GoalBreakdownScreen = () => {
   const navigation = useNavigation();
@@ -18,6 +19,8 @@ const GoalBreakdownScreen = () => {
   const [editingStepId, setEditingStepId] = useState(null);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [stepReminderTime, setStepReminderTime] = useState('');
+  const [showStepReminderPicker, setShowStepReminderPicker] = useState(false);
   const isPremium = usePremiumStatus();
 
   const showDatePicker = () => setDatePickerVisibility(true);
@@ -59,6 +62,7 @@ const GoalBreakdownScreen = () => {
       setStepText('');
       setUrgency('Medium');
       setDeadline('');
+      setStepReminderTime('');
       setEditingStepId(null);
       setShowPriorityPicker(false);
       fetchSteps();
@@ -105,8 +109,20 @@ const GoalBreakdownScreen = () => {
       setStepText('');
       setUrgency('Medium');
       setDeadline('');
+      setStepReminderTime('');
       setShowPriorityPicker(false);
       fetchSteps();
+
+      if (stepReminderTime) {
+        await scheduleNotification(
+          {
+            id: editingStepId || `step-${new Date().getTime()}`,
+            text: stepText,
+          },
+          new Date(stepReminderTime)
+        );
+        setStepReminderTime('');
+      }
     } catch (error) {
       console.error('Error saving step:', error);
       Alert.alert('Error', 'Failed to save step.');
@@ -117,6 +133,7 @@ const GoalBreakdownScreen = () => {
     setStepText(step.text);
     setUrgency(step.urgency);
     setDeadline(step.deadline || '');
+    setStepReminderTime(step.reminderTime || '');
     setEditingStepId(step.id);
   };
 
@@ -254,6 +271,27 @@ const GoalBreakdownScreen = () => {
           onCancel={hideDatePicker}
         />
 
+        <Text style={styles.label} allowFontScaling={true}>
+          When do you want to be reminded about this step?
+        </Text>
+        <TouchableOpacity style={styles.input} onPress={() => setShowStepReminderPicker(true)}>
+          <Text style={{ fontSize: 16 }} allowFontScaling={true}>
+            {stepReminderTime ? stepReminderTime : 'Select reminder date & time'}
+          </Text>
+        </TouchableOpacity>
+        {showStepReminderPicker && (
+          <DateTimePickerModal
+            isVisible={showStepReminderPicker}
+            mode="datetime"
+            onConfirm={(date) => {
+              setShowStepReminderPicker(false);
+              const isoDateTime = date.toISOString();
+              setStepReminderTime(isoDateTime);
+            }}
+            onCancel={() => setShowStepReminderPicker(false)}
+          />
+        )}
+
         <TouchableOpacity style={styles.addButton} onPress={addOrUpdateStep}>
           <Text style={styles.addButtonText} allowFontScaling={true}>
             {editingStepId ? 'Update Step' : 'Add Step'}
@@ -262,10 +300,10 @@ const GoalBreakdownScreen = () => {
 
         {/* render each step manually instead of FlatList */}
         {steps.map((item, index) => (
-  <View key={item.id}>
-    {renderStepItem({ item, index })}
-  </View>
-))}
+          <View key={item.id}>
+            {renderStepItem({ item, index })}
+          </View>
+        ))}
 
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('MainTabs', { screen: 'Categories' })}>
           <Text style={styles.backButtonText} allowFontScaling={true}>← Back to Categories</Text>
@@ -285,7 +323,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
+    paddingTop: 60,
     backgroundColor: '#fff',
   },
   header: {

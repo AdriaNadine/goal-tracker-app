@@ -6,17 +6,10 @@ import CategoriesScreen from './CategoriesScreen';
 import GoalBreakdownScreen from './GoalBreakdownScreen';
 import GoalQuestionScreen from './GoalQuestionsScreen';
 import PremiumScreen from './PremiumScreen';
+import XPStatusScreen from './XPStatusScreen';
 import { View, Text } from 'react-native';
 
 const Tab = createBottomTabNavigator();
-
-function XPStatusScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>XP Status (coming soon)</Text>
-    </View>
-  );
-}
 
 function MainTabs() {
   return (
