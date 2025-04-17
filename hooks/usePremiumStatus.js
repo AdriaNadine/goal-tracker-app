@@ -4,7 +4,7 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import app from '../config/firebase';
 
-const usePremiumStatus = () => {
+export default function usePremiumStatusHook() {
   const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
@@ -38,33 +38,5 @@ const usePremiumStatus = () => {
     check();
   }, []);
 
-  return isPremium;
-};
-
-export const recheckPremiumStatus = async (setIsPremium) => {
-  try {
-    const auth = getAuth(app);
-    const user = auth.currentUser;
-
-    if (user) {
-      const db = getFirestore(app);
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (userSnap.exists()) {
-        const premium = userSnap.data().isPremium === true;
-        setIsPremium(premium);
-        await AsyncStorage.setItem('isPremium', premium.toString());
-        return;
-      }
-    }
-
-    const value = await AsyncStorage.getItem('isPremium');
-    setIsPremium(value === 'true');
-  } catch (error) {
-    const value = await AsyncStorage.getItem('isPremium');
-    setIsPremium(value === 'true');
-  }
-};
-
-export default usePremiumStatus;
+  return [isPremium, setIsPremium];
+}

@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, TextInput } 
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
 import { collection, addDoc, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
-import usePremiumStatus from '../hooks/usePremiumStatus';
+import usePremiumStatusHook from '../hooks/usePremiumStatus';
 
 const goalTemplates = [
   { name: 'Run 5K', category: 'Fitness', color: '#00FF00', answers: { what: 'Run a 5K', why: 'Improve health' } },
@@ -29,7 +29,7 @@ const CategoriesScreen = () => {
   const [newCategoryColor, setNewCategoryColor] = useState('#000000');
   const [showPicker, setShowPicker] = useState(false);
   const [loading, setLoading] = useState(false);
-  const isPremium = usePremiumStatus();
+  const [isPremium] = usePremiumStatusHook();
 
   useEffect(() => {
     fetchCategories();
@@ -182,6 +182,11 @@ const CategoriesScreen = () => {
             <TouchableOpacity style={styles.addButton} onPress={addCategory}>
               <Text style={styles.addButtonText}>Add Category</Text>
             </TouchableOpacity>
+            {!isPremium && categories.length >= 1 && (
+              <Text style={{ textAlign: 'center', color: 'red', marginTop: 10 }}>
+                Upgrade to Premium to create more than 1 category.
+              </Text>
+            )}
   
             {loading && (
               <Text style={{ textAlign: 'center', marginVertical: 20 }}>Loading categories...</Text>

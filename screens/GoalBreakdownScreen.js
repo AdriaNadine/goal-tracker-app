@@ -3,10 +3,11 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert, TextInput 
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
 import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
-import usePremiumStatus from '../hooks/usePremiumStatus';
+import usePremiumStatusHook from '../hooks/usePremiumStatus';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as Haptics from 'expo-haptics';
 import { scheduleNotification } from '../utils/notifications';
+import { awardXP } from '../utils/xp';
 
 const GoalBreakdownScreen = () => {
   const navigation = useNavigation();
@@ -21,7 +22,7 @@ const GoalBreakdownScreen = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [stepReminderTime, setStepReminderTime] = useState('');
   const [showStepReminderPicker, setShowStepReminderPicker] = useState(false);
-  const isPremium = usePremiumStatus();
+  const [isPremium] = usePremiumStatusHook();
 
   const showDatePicker = () => setDatePickerVisibility(true);
   const hideDatePicker = () => setDatePickerVisibility(false);
@@ -112,6 +113,7 @@ const GoalBreakdownScreen = () => {
       setStepReminderTime('');
       setShowPriorityPicker(false);
       fetchSteps();
+      await awardXP(10);
 
       if (stepReminderTime) {
         await scheduleNotification(

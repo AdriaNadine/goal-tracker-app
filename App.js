@@ -13,6 +13,7 @@ import { db } from './config/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './config/firebase';
+import { XPProvider } from './context/XPContext';
 
 const PRODUCT_ID = 'goal_master_unlock';
 
@@ -68,9 +69,11 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <AppNavigator user={user} />
-    </NavigationContainer>
+    <XPProvider>
+      <NavigationContainer>
+        <AppNavigator user={user} />
+      </NavigationContainer>
+    </XPProvider>
   );
 }
 

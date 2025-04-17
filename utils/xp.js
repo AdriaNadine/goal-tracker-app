@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import * as Haptics from 'expo-haptics';
+import { useXP } from '../context/XPContext';
 import { Alert } from 'react-native';
 
 // A simple XP system
@@ -9,6 +10,9 @@ const levelThreshold = 100; // XP needed for each level
 // Function to award XP and handle celebrations and reward notifications
 export const awardXP = async (amount) => {
   currentXP += amount;
+  if (typeof globalThis.setCurrentXP === 'function') {
+    globalThis.setCurrentXP(currentXP);
+  }
   // Here you can update persistent storage or state management if needed
 
   const milestone = checkMilestone(currentXP);

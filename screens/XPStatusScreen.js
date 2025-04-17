@@ -1,15 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, SafeAreaView } from 'react-native';
 import xpModule from '../utils/xp';
+import usePremiumStatusHook from '../hooks/usePremiumStatus';
+import { useXP } from '../context/XPContext';
 
 const levelThreshold = 100;
 
 const XPStatusScreen = () => {
-  const [currentXP, setCurrentXP] = useState(0);
+  const [isPremium] = usePremiumStatusHook();
+  const xp = useXP();
+  if (isPremium === undefined || !xp) return null;
+  if (!isPremium) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.header}>
+          Upgrade to Premium to access XP tracking and rewards!
+        </Text>
+      </SafeAreaView>
+    );
+  }
+  const { currentXP, setCurrentXP } = xp;
   const [reward, setReward] = useState('');
   const [savedReward, setSavedReward] = useState('');
   const [progress, setProgress] = useState(0);
   const [level, setLevel] = useState(0);
+  
+  useEffect(() => {
+    globalThis.setCurrentXP = setCurrentXP;
+    return () => {
+      delete globalThis.setCurrentXP;
+    };
+  }, [setCurrentXP]);
 
   // Dummy function to simulate awarding XP
   const awardDummyXP = async () => {
@@ -57,7 +78,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingVertical: 20,
-    paddingHorizontal: 40,
+    marginTop: 220,
+    marginLeft:20,
+    paddingHorizontal: 20,
     backgroundColor: '#fff'
   },
   header: {

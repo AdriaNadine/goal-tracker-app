@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, Alert, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth } from 'firebase/auth';
 import * as InAppPurchases from 'expo-in-app-purchases';
 import * as Notifications from 'expo-notifications';
 import { initPurchaseListener, unlockPremium } from '../utils/iap';
-import { recheckPremiumStatus } from '../hooks/usePremiumStatus';
 
 const PRODUCT_ID = 'goal_master_unlock';
 
@@ -59,23 +59,14 @@ export default function PremiumScreen() {
         await requestNotificationPermission();
         await InAppPurchases.connectAsync();
 
-        initPurchaseListener(async () => {
-          console.log("🛑 Purchase listener TRIGGERED");
-          const auth = getAuth();
-          const user = auth.currentUser;
-
-          if (!user) {
-            Alert.alert("Sign In Required", "Please sign in before unlocking premium features.");
-            console.warn("🚫 Purchase blocked — user not signed in.");
-            return;
-          }
-
-          await unlockPremium();
-          await recheckPremiumStatus(setIsPremium);
-          Alert.alert("🎉 Thank you for your purchase!", "Premium unlocked.");
+        initPurchaseListener(() => {
+          console.log("🟢 Purchase listener fired. Calling unlockPremium...");
+          unlockPremium();
+          setIsPremium(true);
         });
 
         await fetchProducts();
+        // Check and set premium status on load (removed auto premium default)
       } catch (err) {
         console.warn("🔥 IAP init error:", err);
       }
@@ -110,7 +101,8 @@ export default function PremiumScreen() {
                 const unlocked = Array.isArray(history) && history.some(p => p.productId === PRODUCT_ID);
                 if (unlocked) {
                   await unlockPremium();
-                  await recheckPremiumStatus(setIsPremium);
+                  console.log('🔓 unlockPremium() called from restore flow');
+                  setIsPremium(true);
                   Alert.alert('✅ Purchase restored!', 'Premium access reinstated.');
                 } else {
                   Alert.alert('❌ No previous purchase found.');
@@ -125,6 +117,17 @@ export default function PremiumScreen() {
       ) : !isPremium ? (
         <Text style={styles.errorMessage}>⚠️ Product is currently unavailable.</Text>
       ) : null}
+      
+      {__DEV__ && (
+        <Button
+          title="Reset Premium (DEV)"
+          onPress={async () => {
+            await AsyncStorage.removeItem('isPremium');
+            setIsPremium(false);
+            console.log('🔄 Premium reset for testing');
+          }}
+        />
+      )}
     </View>
   );
 }
