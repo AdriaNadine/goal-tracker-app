@@ -21,7 +21,7 @@ const DashboardScreen = () => {
   const [goals, setGoals] = useState([]);
   const [steps, setSteps] = useState([]);
   const [quote, setQuote] = useState('');
-  const isPremium = usePremiumStatus();
+  const [isPremium] = usePremiumStatus();
 
   const fetchData = async () => {
     if (auth.currentUser) {

@@ -51,11 +51,13 @@ export const initPurchaseListener = (onUnlock) => {
 };
 
 export const unlockPremium = async () => {
-  console.log('🔥 unlockPremium() was called');
+  console.log('🔓 Starting unlockPremium...');
   try {
+    // 1. Local save
     await AsyncStorage.setItem('isPremium', 'true');
     console.log('✨ Premium unlocked and stored in AsyncStorage');
 
+    // 2. Auth check loop
     const auth = getAuth(app);
     let user = auth.currentUser;
     let attempts = 0;
@@ -67,28 +69,22 @@ export const unlockPremium = async () => {
       user = auth.currentUser;
       attempts++;
     }
-    console.log('👤 Resolved user after retry:', user);
+
+    // 3. Abort if no UID
     if (!user || !user.uid) {
-      console.warn('❌ Still no user UID after retrying. Skipping Firestore write.');
+      console.warn('❌ No user UID found after retry. Skipping Firestore write.');
       return;
     }
 
+    // 4. Firestore write
     const db = getFirestore(app);
     const userRef = doc(db, 'users', user.uid);
-    console.log('📄 Writing premium status to Firestore for UID:', user.uid);
-    console.log('📤 Attempting Firestore write with:');
-    console.log('   user?.uid:', user?.uid);
-    console.log('   user:', user);
-    console.log('   typeof user.uid:', typeof user?.uid);
+    await setDoc(userRef, { isPremium: true }, { merge: true });
 
-    try {
-      await setDoc(userRef, { isPremium: true }, { merge: true });
-      console.log('✅ Premium status saved to Firestore');
-    } catch (error) {
-      console.error('❌ Firestore write failed:', error);
-    }
+    console.log('✅ Firestore write succeeded: isPremium saved');
+
   } catch (error) {
-    console.error('Failed to unlock premium:', error);
+    console.error('💥 unlockPremium failed:', error);
   }
 };
 
