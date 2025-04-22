@@ -18,7 +18,7 @@
     },
     "production": {
       "autoIncrement": false,
-      "version": "4.01",
+      "version": "4.0.1",
       "buildNumber": "1",
       "env": {
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyBT1JdEudWXmdROFLEv97AxQmP-K4fVAOk",

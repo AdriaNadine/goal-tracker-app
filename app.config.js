@@ -2,7 +2,7 @@ export default {
   expo: {
     name: "Goal Tracker",
     slug: "goal-tracker-app",
-    version: "4.01",
+    version: "4.0.1",
     icon: "./assets/icon.png",
     ios: {
       bundleIdentifier: 'com.adriaross.goaltracker',
