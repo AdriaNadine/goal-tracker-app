@@ -2,9 +2,10 @@ export default {
   expo: {
     name: "Goal Tracker",
     slug: "goal-tracker-app",
+      icon: './assets/icon.png',
     version: "4.0.1", // ✅ App version goes here
     ios: {
-      buildNumber: "1", // ✅ Move this here!
+      buildNumber: "2", // ✅ Move this here!
       bundleIdentifier: 'com.adriaross.goaltracker',
       googleServicesFile: './assets/ios/GoogleService-Info.plist',
       infoPlist: {

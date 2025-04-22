@@ -18,7 +18,7 @@ import { XPProvider } from './context/XPContext';
 const PRODUCT_ID = 'goal_master_unlock';
 
 export default function App() {
-  const isPremium = usePremiumStatus();
+  const [isPremium] = usePremiumStatus();
   const version =
     Constants?.expoConfig?.version ||
     Constants?.manifest2?.extra?.expoClient?.version ||
@@ -60,6 +60,10 @@ const requestNotificationPermissions = async () => {
      requestNotificationPermissions();
    }, []);
 
+  // Debug logs for stuck loading state
+  console.log("👤 Firebase user:", user);
+  console.log("🔐 Premium status:", isPremium);
+  console.log("⏳ Loading:", loading);
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

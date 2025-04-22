@@ -14,12 +14,19 @@ import GuidedMeditationScreen from './screens/GuidedMeditationScreen';
 
 const Stack = createNativeStackNavigator();
 
-export default function AppNavigator() {
+export default function AppNavigator({ user }) {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Welcome">
-      <Stack.Screen name="Welcome" component={WelcomeScreen} />
-      <Stack.Screen name="SignIn" component={SignInScreen} />
-      <Stack.Screen name="SignUp" component={SignUpScreen} />
+    <Stack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName={user ? 'MainTabs' : 'Welcome'}
+    >
+      {!user && (
+        <>
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="SignIn" component={SignInScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
+        </>
+      )}
       <Stack.Screen name="MainTabs" component={MainTabs} />
       <Stack.Screen name="GuidedMeditation" component={GuidedMeditationScreen} />
     </Stack.Navigator>
