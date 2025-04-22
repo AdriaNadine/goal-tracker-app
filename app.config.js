@@ -2,16 +2,16 @@ export default {
   expo: {
     name: "Goal Tracker",
     slug: "goal-tracker-app",
-    version: "4.0.1",
-    icon: "./assets/icon.png",
+    version: "4.0.1", // ✅ App version goes here
     ios: {
+      buildNumber: "1", // ✅ Move this here!
       bundleIdentifier: 'com.adriaross.goaltracker',
       googleServicesFile: './assets/ios/GoogleService-Info.plist',
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
         NSMicrophoneUsageDescription: 'This app uses your microphone for guided meditations.',
         NSCalendarsUsageDescription: 'This app needs access to your calendar to manage reminders.',
-NSUserNotificationAlertUsageDescription: 'This app needs permission to send you notifications.'
+        NSUserNotificationAlertUsageDescription: 'This app needs permission to send you notifications.'
       }
     },
     android: {
