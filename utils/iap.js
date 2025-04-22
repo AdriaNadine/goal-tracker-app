@@ -5,12 +5,18 @@ import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { app } from '../config/firebase';
 
 const ITEM_ID = 'goal_master_unlock'; // Must match App Store Connect
+let storeConnected = false;
 
 export const connectToStore = async (setIsPremium) => {
+  if (storeConnected) {
+    console.log('⚠️ Store already connected. Skipping duplicate connect.');
+    return;
+  }
+
   const { responseCode } = await InAppPurchases.connectAsync();
   if (responseCode === InAppPurchases.IAPResponseCode.OK) {
     console.log('Connected to App Store ✅');
-    setIsPremium(true);
+    storeConnected = true;
   } else {
     console.warn('Failed to connect to App Store ❌');
   }
@@ -30,24 +36,43 @@ export const getAvailableProducts = async () => {
 
 export const initPurchaseListener = (onUnlock) => {
   console.log('📡 Setting up purchase listener...');
+  
+  if (typeof InAppPurchases.setPurchaseListener !== 'function') {
+    console.warn('🚫 setPurchaseListener is not available.');
+    return;
+  }
+
   InAppPurchases.setPurchaseListener(async ({ responseCode, results, errorCode }) => {
     console.log('📦 Global Purchase listener triggered', { responseCode, results, errorCode });
 
     if (responseCode === InAppPurchases.IAPResponseCode.OK) {
+      if (results.length === 0) {
+        console.log('🛑 No purchases found in results.');
+      }
       for (const purchase of results) {
         console.log('🧾 Purchase result:', purchase);
         if (!purchase.acknowledged && purchase.productId === ITEM_ID) {
           console.log('✅ Unacknowledged purchase — finishing transaction...');
           await InAppPurchases.finishTransactionAsync(purchase, false);
+          console.log('🎉 Calling unlockPremium...');
           await onUnlock();
         } else {
-          console.log('🟡 Purchase already acknowledged');
+          console.log('🟡 Purchase already acknowledged or productId mismatch');
         }
       }
     } else {
-      console.warn('❌ Purchase listener error:', errorCode);
+      console.warn(`❌ Purchase listener error [${responseCode}]:`, errorCode);
     }
   });
+
+  // 💻 Simulate unlockPremium in development mode
+  if (__DEV__ && typeof onUnlock === 'function') {
+    console.log('🧪 Dev mode: Simulating premium unlock...');
+    setTimeout(() => {
+      console.log('🔄 Simulating onUnlock callback');
+      onUnlock();
+    }, 3000);
+  }
 };
 
 export const unlockPremium = async () => {

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, SafeAreaView } from 'react-native';
-import xpModule from '../utils/xp';
 import usePremiumStatusHook from '../hooks/usePremiumStatus';
 import { useXP } from '../context/XPContext';
 
@@ -8,8 +7,22 @@ const levelThreshold = 100;
 
 const XPStatusScreen = () => {
   const [isPremium] = usePremiumStatusHook();
-  const xp = useXP();
-  if (isPremium === undefined || !xp) return null;
+  const { currentXP, awardXP } = useXP();
+
+  const [reward, setReward] = useState('');
+  const [savedReward, setSavedReward] = useState('');
+  const [progress, setProgress] = useState(0);
+  const [level, setLevel] = useState(0);
+
+  // ✅ Loading state — wait for values to load
+  if (typeof isPremium === 'undefined' || typeof currentXP !== 'number') {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
+
   if (!isPremium) {
     return (
       <SafeAreaView style={styles.container}>
@@ -19,23 +32,10 @@ const XPStatusScreen = () => {
       </SafeAreaView>
     );
   }
-  const { currentXP, setCurrentXP } = xp;
-  const [reward, setReward] = useState('');
-  const [savedReward, setSavedReward] = useState('');
-  const [progress, setProgress] = useState(0);
-  const [level, setLevel] = useState(0);
-  
-  useEffect(() => {
-    globalThis.setCurrentXP = setCurrentXP;
-    return () => {
-      delete globalThis.setCurrentXP;
-    };
-  }, [setCurrentXP]);
 
-  // Dummy function to simulate awarding XP
-  const awardDummyXP = async () => {
-    const newXP = await xpModule.awardXP(10);
-    setCurrentXP(newXP);
+  // ✅ Award 10 XP via context method
+  const awardDummyXP = () => {
+    awardXP(10);
   };
 
   useEffect(() => {
@@ -43,10 +43,8 @@ const XPStatusScreen = () => {
     setProgress(currentXP % levelThreshold);
   }, [currentXP]);
 
-  // Save reward function: update the savedReward state
   const handleSaveReward = () => {
     setSavedReward(reward);
-    // Ideally, persist this reward in storage or backend if needed
     Alert.alert('Reward saved', `Your reward: ${reward}`);
   };
 
@@ -60,7 +58,7 @@ const XPStatusScreen = () => {
         <View style={[styles.progressFill, { width: `${(progress / levelThreshold) * 100}%` }]} />
       </View>
       <Button title="Award 10 XP" onPress={awardDummyXP} />
-      
+
       <Text style={styles.subheader}>Set Your Reward</Text>
       <TextInput
         style={styles.input}
@@ -79,7 +77,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 20,
     marginTop: 220,
-    marginLeft:20,
+    marginLeft: 20,
     paddingHorizontal: 20,
     backgroundColor: '#fff'
   },

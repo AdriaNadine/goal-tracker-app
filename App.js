@@ -52,13 +52,13 @@ export default function App() {
     }
   }, [user]);
 
-  // useEffect(() => {
-  //   const requestNotificationPermissions = async () => {
-  //     const { status } = await Notifications.getPermissionsAsync();
-  //     // Additional logic for handling notification permissions
-  //   };
-  //   requestNotificationPermissions();
-  // }, []);
+useEffect(() => {
+const requestNotificationPermissions = async () => {
+      const { status } = await Notifications.getPermissionsAsync();
+       // Additional logic for handling notification permissions
+     };
+     requestNotificationPermissions();
+   }, []);
 
   if (loading) {
     return (

@@ -5,11 +5,16 @@ import { getAuth } from 'firebase/auth';
 import app from '../config/firebase';
 
 export default function usePremiumStatusHook() {
-  const [isPremium, setIsPremium] = useState(false);
+  const [isPremium, setIsPremium] = useState(undefined); // initially undefined
 
   useEffect(() => {
     const check = async () => {
       try {
+        const value = await AsyncStorage.getItem('isPremium');
+        if (value !== null) {
+          setIsPremium(value === 'true');
+        }
+
         const auth = getAuth(app);
         const user = auth.currentUser;
 
@@ -25,13 +30,8 @@ export default function usePremiumStatusHook() {
             return;
           }
         }
-
-        const value = await AsyncStorage.getItem('isPremium');
-        setIsPremium(value === 'true');
       } catch (error) {
         console.error('Error checking premium status:', error);
-        const value = await AsyncStorage.getItem('isPremium');
-        setIsPremium(value === 'true');
       }
     };
 

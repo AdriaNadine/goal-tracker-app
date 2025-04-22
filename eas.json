@@ -17,7 +17,9 @@
       }
     },
     "production": {
-      "autoIncrement": true,
+      "autoIncrement": false,
+      "version": "4.01",
+      "buildNumber": "1",
       "env": {
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyBT1JdEudWXmdROFLEv97AxQmP-K4fVAOk",
         "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "goaltracker-36dfb.firebaseapp.com",
