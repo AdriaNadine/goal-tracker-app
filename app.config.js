@@ -3,9 +3,14 @@ export default {
     name: "Goal Tracker",
     slug: "goal-tracker-app",
       icon: './assets/icon.png',
-    version: "4.0.1", // ✅ App version goes here
+      splash: {
+        image: "./assets/splash.png", // ← Make sure this exists
+        resizeMode: "contain",
+        backgroundColor: "#ffffff"
+      },
+    version: "4.0.1",
     ios: {
-      buildNumber: "2", // ✅ Move this here!
+      buildNumber: "33",
       bundleIdentifier: 'com.adriaross.goaltracker',
       googleServicesFile: './assets/ios/GoogleService-Info.plist',
       infoPlist: {

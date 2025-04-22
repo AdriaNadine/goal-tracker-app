@@ -27,11 +27,16 @@ export default function PremiumScreen() {
   const fetchProducts = async () => {
     try {
       const { responseCode, results } = await InAppPurchases.getProductsAsync([PRODUCT_ID]);
-      if (responseCode === InAppPurchases.IAPResponseCode.OK && results.length > 0) {
-        setProduct(results[0]);
-        console.log('✅ Product loaded:', results[0]);
+      if (responseCode === InAppPurchases.IAPResponseCode.OK) {
+        if (results.length > 0) {
+          console.log('✅ Product loaded:', results[0]);
+          setProduct(results[0]);
+        } else {
+          console.warn('❌ No IAP products returned. Likely unapproved or mismatched Product ID.');
+          Alert.alert('IAP Unavailable', 'Product could not be loaded. Please try again later.');
+        }
       } else {
-        console.warn('⚠️ No products found or failed to load');
+        console.warn('⚠️ IAP response code not OK:', responseCode);
       }
     } catch (err) {
       console.warn('🔥 Error fetching products:', err);
@@ -40,15 +45,18 @@ export default function PremiumScreen() {
 
   // 💳 Trigger purchase
   const handleBuy = async () => {
+    console.log('🛒 Purchase button tapped');
     if (product) {
       try {
+        console.log('📦 Attempting to purchase:', product.productId);
         await InAppPurchases.purchaseItemAsync(product.productId);
       } catch (error) {
         Alert.alert("Purchase error", "An error occurred while trying to make the purchase.");
-        console.warn(error);
+        console.warn('🚫 Purchase error:', error);
       }
     } else {
       Alert.alert("Product not available", "Unable to purchase at this time.");
+      console.warn('⚠️ Tried to buy, but product is null');
     }
   };
 
