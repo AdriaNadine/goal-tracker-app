@@ -9,6 +9,11 @@ const XPStatusScreen = () => {
   const [isPremium] = usePremiumStatusHook();
   const { currentXP, awardXP } = useXP();
 
+  // 🔍 Debug logging for blank screen diagnosis
+  console.log("🔍 XPStatusScreen mounted");
+  console.log("👤 isPremium:", isPremium);
+  console.log("📊 currentXP from context:", currentXP);
+
   const [reward, setReward] = useState('');
   const [savedReward, setSavedReward] = useState('');
   const [progress, setProgress] = useState(0);
@@ -19,6 +24,15 @@ const XPStatusScreen = () => {
     return (
       <SafeAreaView style={styles.container}>
         <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  // Optional fallback render if something fails silently
+  if (!isPremium && typeof currentXP !== 'number') {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text>⏳ Waiting on XP context or premium status...</Text>
       </SafeAreaView>
     );
   }
