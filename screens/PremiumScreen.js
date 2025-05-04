@@ -66,10 +66,21 @@ export default function PremiumScreen() {
       try {
         await requestNotificationPermission();
         await InAppPurchases.connectAsync();
+        await fetchProducts();
+
+        const storedStatus = await AsyncStorage.getItem('isPremium');
+        if (storedStatus === 'true') {
+          console.log('💾 Loaded premium status from AsyncStorage');
+          setIsPremium(true);
+        }
+
+        const user = getAuth().currentUser;
+        console.log('👤 Current Firebase user:', user?.uid || 'Not signed in');
 
         initPurchaseListener(() => {
           console.log("🟢 Purchase listener fired. Calling unlockPremium...");
           unlockPremium();
+          AsyncStorage.setItem('isPremium', 'true');
           setIsPremium(true);
         });
 
@@ -105,15 +116,20 @@ export default function PremiumScreen() {
             title="Restore Purchase"
             onPress={async () => {
               try {
-                const history = await InAppPurchases.getPurchaseHistoryAsync();
-                const unlocked = Array.isArray(history) && history.some(p => p.productId === PRODUCT_ID);
-                if (unlocked) {
-                  await unlockPremium();
-                  console.log('🔓 unlockPremium() called from restore flow');
-                  setIsPremium(true);
-                  Alert.alert('✅ Purchase restored!', 'Premium access reinstated.');
+                const { responseCode, results } = await InAppPurchases.getPurchaseHistoryAsync();
+                if (responseCode === InAppPurchases.IAPResponseCode.OK) {
+                  const unlocked = Array.isArray(results) && results.some(p => p.productId === PRODUCT_ID);
+                  if (unlocked) {
+                    await unlockPremium();
+                    await AsyncStorage.setItem('isPremium', 'true');
+                    console.log('🔓 unlockPremium() called from restore flow');
+                    setIsPremium(true);
+                    Alert.alert('✅ Purchase restored!', 'Premium access reinstated.');
+                  } else {
+                    Alert.alert('❌ No previous purchase found.');
+                  }
                 } else {
-                  Alert.alert('❌ No previous purchase found.');
+                  Alert.alert('Error', 'Could not access purchase history.');
                 }
               } catch (err) {
                 console.warn('⚠️ Error restoring purchase:', err);
