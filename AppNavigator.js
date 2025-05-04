@@ -29,6 +29,7 @@ export default function AppNavigator({ user }) {
       )}
       <Stack.Screen name="MainTabs" component={MainTabs} />
       <Stack.Screen name="GuidedMeditation" component={GuidedMeditationScreen} />
+      {user && <Stack.Screen name="Premium" component={PremiumScreen} />}
     </Stack.Navigator>
   );
 }

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, Alert, StyleSheet } from 'react-native';
+import { View, Text, Button, Alert, StyleSheet, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth } from 'firebase/auth';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import * as InAppPurchases from 'expo-in-app-purchases';
 import * as Notifications from 'expo-notifications';
 import { initPurchaseListener, unlockPremium } from '../utils/iap';
@@ -11,6 +12,8 @@ const PRODUCT_ID = 'goal_master_unlock';
 export default function PremiumScreen() {
   const [product, setProduct] = useState(null);
   const [isPremium, setIsPremium] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   // 🔔 Ask for notification permission
   const requestNotificationPermission = async () => {
@@ -74,20 +77,37 @@ export default function PremiumScreen() {
           setIsPremium(true);
         }
 
-        const user = getAuth().currentUser;
-        console.log('👤 Current Firebase user:', user?.uid || 'Not signed in');
+        const authUser = getAuth().currentUser;
+        console.log('👤 Current Firebase user:', authUser?.uid || 'Not signed in');
+        setUser(authUser);
 
-        initPurchaseListener(() => {
+        const db = getFirestore();
+        if (authUser) {
+          const userDoc = await getDoc(doc(db, 'users', authUser.uid));
+          if (userDoc.exists() && userDoc.data().premium === true) {
+            console.log('☁️ Loaded premium status from Firestore');
+            setIsPremium(true);
+          }
+        }
+
+        initPurchaseListener(async () => {
           console.log("🟢 Purchase listener fired. Calling unlockPremium...");
-          unlockPremium();
-          AsyncStorage.setItem('isPremium', 'true');
+          await unlockPremium();
+          await AsyncStorage.setItem('isPremium', 'true');
+          const user = getAuth().currentUser;
+          const db = getFirestore();
+          if (user) {
+            await setDoc(doc(db, 'users', user.uid), { premium: true }, { merge: true });
+          }
           setIsPremium(true);
         });
 
         await fetchProducts();
         // Check and set premium status on load (removed auto premium default)
+        setLoading(false);
       } catch (err) {
         console.warn("🔥 IAP init error:", err);
+        setLoading(false);
       }
     };
 
@@ -97,6 +117,7 @@ export default function PremiumScreen() {
       InAppPurchases.disconnectAsync();
     };
   }, []);
+
 
   return (
     <View style={styles.container}>
@@ -109,7 +130,11 @@ export default function PremiumScreen() {
         <Text style={styles.premiumBadge}>🌟 Premium Active</Text>
       )}
 
-      {!isPremium && product && typeof product.price === 'string' ? (
+      {loading && (
+        <ActivityIndicator size="large" color="#0000ff" style={{ marginVertical: 20 }} />
+      )}
+
+      {!loading && !isPremium && product && typeof product.price === 'string' ? (
         <>
           <Button title={`Buy for ${product.price}`} onPress={handleBuy} />
           <Button
@@ -122,6 +147,11 @@ export default function PremiumScreen() {
                   if (unlocked) {
                     await unlockPremium();
                     await AsyncStorage.setItem('isPremium', 'true');
+                    const db = getFirestore();
+                    const user = getAuth().currentUser;
+                    if (user) {
+                      await setDoc(doc(db, 'users', user.uid), { premium: true }, { merge: true });
+                    }
                     console.log('🔓 unlockPremium() called from restore flow');
                     setIsPremium(true);
                     Alert.alert('✅ Purchase restored!', 'Premium access reinstated.');
@@ -138,7 +168,7 @@ export default function PremiumScreen() {
             }}
           />
         </>
-      ) : !isPremium ? (
+      ) : !loading && !isPremium ? (
         <Text style={styles.errorMessage}>⚠️ Product is currently unavailable.</Text>
       ) : null}
       

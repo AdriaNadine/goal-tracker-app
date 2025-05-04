@@ -19,43 +19,15 @@ const XPStatusScreen = () => {
   const [progress, setProgress] = useState(0);
   const [level, setLevel] = useState(0);
 
-  // ✅ Loading state — wait for values to load
-  if (typeof isPremium === 'undefined' || typeof currentXP !== 'number') {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text>Loading...</Text>
-      </SafeAreaView>
-    );
-  }
-
-  // Optional fallback render if something fails silently
-  if (!isPremium && typeof currentXP !== 'number') {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text>⏳ Waiting on XP context or premium status...</Text>
-      </SafeAreaView>
-    );
-  }
-
-  if (!isPremium) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.header}>
-          Upgrade to Premium to access XP tracking and rewards!
-        </Text>
-      </SafeAreaView>
-    );
-  }
+  useEffect(() => {
+    setLevel(Math.floor(currentXP / levelThreshold));
+    setProgress(currentXP % levelThreshold);
+  }, [currentXP]);
 
   // ✅ Award 10 XP via context method
   const awardDummyXP = () => {
     awardXP(10);
   };
-
-  useEffect(() => {
-    setLevel(Math.floor(currentXP / levelThreshold));
-    setProgress(currentXP % levelThreshold);
-  }, [currentXP]);
 
   const handleSaveReward = () => {
     setSavedReward(reward);
@@ -63,26 +35,50 @@ const XPStatusScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>XP Status</Text>
-      <Text style={styles.status}>Current XP: {currentXP}</Text>
-      <Text style={styles.status}>Level: {level}</Text>
-      <Text style={styles.status}>Progress to next level: {progress} / {levelThreshold}</Text>
-      <View style={styles.progressBar}>
-        <View style={[styles.progressFill, { width: `${(progress / levelThreshold) * 100}%` }]} />
-      </View>
-      <Button title="Award 10 XP" onPress={awardDummyXP} />
+    <>
+      {(typeof isPremium === 'undefined' || typeof currentXP !== 'number') && (
+        <SafeAreaView style={styles.container}>
+          <Text>Loading...</Text>
+        </SafeAreaView>
+      )}
 
-      <Text style={styles.subheader}>Set Your Reward</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your reward..."
-        value={reward}
-        onChangeText={setReward}
-      />
-      <Button title="Save Reward" onPress={handleSaveReward} />
-      {savedReward ? <Text style={styles.savedReward}>Your reward: {savedReward}</Text> : null}
-    </SafeAreaView>
+      {(!isPremium && typeof currentXP !== 'number') && (
+        <SafeAreaView style={styles.container}>
+          <Text>⏳ Waiting on XP context or premium status...</Text>
+        </SafeAreaView>
+      )}
+
+      {isPremium && typeof currentXP === 'number' && (
+        <SafeAreaView style={styles.container}>
+          <Text style={styles.header}>XP Status</Text>
+          <Text style={styles.status}>Current XP: {currentXP}</Text>
+          <Text style={styles.status}>Level: {level}</Text>
+          <Text style={styles.status}>Progress to next level: {progress} / {levelThreshold}</Text>
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, { width: `${(progress / levelThreshold) * 100}%` }]} />
+          </View>
+          <Button title="Award 10 XP" onPress={awardDummyXP} />
+
+          <Text style={styles.subheader}>Set Your Reward</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your reward..."
+            value={reward}
+            onChangeText={setReward}
+          />
+          <Button title="Save Reward" onPress={handleSaveReward} />
+          {savedReward ? <Text style={styles.savedReward}>Your reward: {savedReward}</Text> : null}
+        </SafeAreaView>
+      )}
+
+      {!isPremium && typeof currentXP === 'number' && (
+        <SafeAreaView style={styles.container}>
+          <Text style={styles.header}>
+            Upgrade to Premium to access XP tracking and rewards!
+          </Text>
+        </SafeAreaView>
+      )}
+    </>
   );
 };
 
