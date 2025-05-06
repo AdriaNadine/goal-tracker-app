@@ -7,6 +7,7 @@ import GoalBreakdownScreen from './GoalBreakdownScreen';
 import GoalQuestionScreen from './GoalQuestionsScreen';
 import PremiumScreen from './PremiumScreen';
 import XPStatusScreen from './XPStatusScreen';
+import ReflectionScreen from './ReflectionScreen';
 import { View, Text } from 'react-native';
 
 const Tab = createBottomTabNavigator();
@@ -14,13 +15,62 @@ const Tab = createBottomTabNavigator();
 function MainTabs() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Categories" component={CategoriesScreen} />
-      <Tab.Screen name="Goals" component={GoalQuestionScreen} />
-      <Tab.Screen name="Steps" component={GoalBreakdownScreen} />
-      <Tab.Screen name="Progress" component={ProgressScreen} />
-      <Tab.Screen name="XPStatus" component={XPStatusScreen} />
-      <Tab.Screen name="Premium" component={PremiumScreen} />
+      <Tab.Screen
+        name="Dashboard"
+        component={DashboardScreen}
+        options={{
+          tabBarLabel: 'Dashboard',
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>🧭</Text>
+        }}
+      />
+      <Tab.Screen
+        name="Categories"
+        component={CategoriesScreen}
+        options={{
+          tabBarLabel: 'Categories',
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>🗂️</Text>
+        }}
+      />
+      <Tab.Screen
+        name="Goals"
+        component={GoalQuestionScreen}
+        options={{
+          tabBarLabel: 'Goals',
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>🎯</Text>
+        }}
+      />
+      <Tab.Screen
+        name="Steps"
+        component={GoalBreakdownScreen}
+        options={{
+          tabBarLabel: 'Steps',
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>📋</Text>
+        }}
+      />
+      <Tab.Screen
+        name="Progress"
+        component={ProgressScreen}
+        options={{
+          tabBarLabel: 'Progress',
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>📈</Text>
+        }}
+      />
+      <Tab.Screen
+        name="XPStatus"
+        component={XPStatusScreen}
+        options={{
+          tabBarLabel: 'XP',
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>✨</Text>
+        }}
+      />
+      <Tab.Screen
+        name="Reflection"
+        component={ReflectionScreen}
+        options={{
+          tabBarLabel: 'Reflection',
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>🏆</Text>
+        }}
+      />
     </Tab.Navigator>
   );
 }

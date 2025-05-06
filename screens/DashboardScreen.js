@@ -6,6 +6,7 @@ import { signOut } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import usePremiumStatus from '../hooks/usePremiumStatus';
 import SignInScreen from './SignInScreen';
+import { Ionicons } from '@expo/vector-icons';
 
 const motivationalQuotes = [
   "Small steps every day lead to big results.",
@@ -34,7 +35,12 @@ const DashboardScreen = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      setGoals(userGoals);
+      const completedSnapshot = await getDocs(
+        query(collection(db, 'completedGoals'), where('userId', '==', auth.currentUser.uid))
+      );
+      const completedGoalIds = completedSnapshot.docs.map(doc => doc.id);
+      const activeGoals = userGoals.filter(goal => !completedGoalIds.includes(goal.id));
+      setGoals(activeGoals);
 
       const stepsQuery = query(
         collection(db, 'steps'),
@@ -206,7 +212,12 @@ const DashboardScreen = () => {
       <FlatList
         ListHeaderComponent={
           <>
-            <Text style={styles.header} allowFontScaling={true}>Dashboard</Text>
+            <View style={styles.headerRow}>
+              <Text style={styles.header} allowFontScaling={true}>Dashboard</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+                <Ionicons name="settings-outline" size={24} color="#007AFF" />
+              </TouchableOpacity>
+            </View>
             <Text style={styles.quote} allowFontScaling={true}>{`Today’s Motivation: "${quote}"`}</Text>
             <Text style={styles.userInfo} allowFontScaling={true}>Welcome, {userEmail}!</Text>
             <Text style={styles.sectionTitle} allowFontScaling={true}>Your Categories</Text>
@@ -226,14 +237,6 @@ const DashboardScreen = () => {
               ListEmptyComponent={<Text style={styles.emptyText} allowFontScaling={true}>No goals yet.</Text>}
               scrollEnabled={false}
             />
-            {!isPremium && (
-              <TouchableOpacity
-                style={[styles.button, { backgroundColor: '#8E44AD' }]}
-                onPress={() => navigation.navigate('Premium')}
-              >
-                <Text style={styles.buttonText} allowFontScaling={true}>Unlock Premium Features</Text>
-              </TouchableOpacity>
-            )}
             {!isPremium && (
               <>
                 {(getCategorySummary().length >= 1 || goals.length >= 3 || steps.length >= 5) && (
@@ -270,7 +273,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 50,
     paddingBottom: 50,
     backgroundColor: '#f5f5f5',
   },
@@ -279,6 +282,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingBottom: 30,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   header: {
     fontSize: 24,

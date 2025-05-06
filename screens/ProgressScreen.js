@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Share, Alert } from 'react-native';
 import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useXP } from '../context/XPContext';
 
 const ProgressScreen = () => {
   const navigation = useNavigation();
@@ -13,6 +14,7 @@ const ProgressScreen = () => {
   const [sortType, setSortType] = useState('default');
   const [error, setError] = useState(null);
   const [currentXP, setCurrentXP] = useState(0);
+  const { awardXP } = useXP();
 
   const fetchData = async () => {
     if (!auth.currentUser) {
@@ -81,15 +83,63 @@ const ProgressScreen = () => {
 
       if (!currentStatus) { // step was just completed
         try {
-          const storedXP = await AsyncStorage.getItem('userXP');
-          let xp = storedXP ? parseInt(storedXP, 10) : 0;
-          xp += 10;
-          await AsyncStorage.setItem('userXP', xp.toString());
-          Alert.alert("Step Completed", `You earned 10 XP! Total XP: ${xp}`);
+          awardXP(10);
+          Alert.alert("Step Completed", `You earned 10 XP!`);
         } catch (err) {
           console.error('Error updating XP:', err);
         }
       }
+
+      // Check if all steps for the goal are now completed
+      const updatedStep = steps.find(s => s.id === stepId);
+      if (updatedStep) {
+        const goalId = updatedStep.goalId;
+        const goalSteps = steps
+          .filter(s => s.goalId === goalId && s.id !== stepId)
+          .map(s => s.completed)
+          .concat([!currentStatus]); // include the new value for this toggled step
+
+        const allDone = goalSteps.every(Boolean);
+
+        if (allDone) {
+          Alert.alert(
+            "🎉 Goal Completed!",
+            "You’ve completed all steps for this goal. Would you like to mark it as fully completed and move it to reflections?",
+            [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Yes",
+                onPress: async () => {
+                  try {
+                    const goalDoc = goals.find(g => g.id === goalId);
+                    if (goalDoc) {
+                      // Fetch all steps for this goal
+                      const stepsSnapshot = await getDocs(
+                        query(collection(db, 'steps'), where('goalId', '==', goalId))
+                      );
+                      const completedSteps = stepsSnapshot.docs.map(doc => doc.data());
+
+                      await setDoc(doc(db, 'completedGoals', goalId), {
+                        ...goalDoc,
+                        completedSteps,
+                        completedAt: new Date().toISOString(),
+                        userId: auth.currentUser.uid
+                      });
+                      console.log("✅ Moved to completedGoals");
+
+                      setGoals(prev => prev.filter(g => String(g.id) !== String(goalId)));
+                      navigation.navigate('Reflection');
+                    }
+                  } catch (err) {
+                    console.warn("⚠️ Error archiving goal:", err);
+                  }
+                }
+              }
+            ]
+          );
+        }
+      }
+
     } catch (error) {
       console.error('Error updating step completion:', error);
       setError(error.message);

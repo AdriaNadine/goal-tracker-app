@@ -53,12 +53,24 @@ export default function App() {
   }, [user]);
 
 useEffect(() => {
-const requestNotificationPermissions = async () => {
-      const { status } = await Notifications.getPermissionsAsync();
-       // Additional logic for handling notification permissions
-     };
-     requestNotificationPermissions();
-   }, []);
+  const requestNotificationPermissions = async () => {
+    const { status } = await Notifications.getPermissionsAsync();
+    // Additional logic for handling notification permissions
+  };
+  requestNotificationPermissions();
+
+  // Schedule a test notification 10 seconds after app launch
+  const sendTestNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: '🔔 Test Notification',
+        body: 'This is a test notification from App.js.',
+      },
+      trigger: { seconds: 10 },
+    });
+  };
+  sendTestNotification();
+}, []);
 
   // Debug logs for stuck loading state
   console.log("👤 Firebase user:", user);

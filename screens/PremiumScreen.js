@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, Alert, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Button, Alert, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
@@ -14,6 +15,8 @@ export default function PremiumScreen() {
   const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+
+  const navigation = useNavigation();
 
   // 🔔 Ask for notification permission
   const requestNotificationPermission = async () => {
@@ -121,6 +124,9 @@ export default function PremiumScreen() {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ alignSelf: 'flex-start', padding: 10 }}>
+        <Text style={{ fontSize: 16, color: '#007AFF' }}>← Back</Text>
+      </TouchableOpacity>
       <Text style={styles.title} allowFontScaling={true}>Goal Master Upgrade</Text>
       <Text style={styles.description} allowFontScaling={true}>
         Unlock unlimited goals, save your reflections, and personalize your dashboard!
