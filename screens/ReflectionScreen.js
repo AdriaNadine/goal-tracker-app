@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TextInput, Button, StyleSheet } from 'react-native';
-import { getFirestore, collection, getDocs, doc, updateDoc, query, where } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, updateDoc, query, where, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const ReflectionScreen = () => {
@@ -37,6 +37,26 @@ const ReflectionScreen = () => {
     setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const handleReopenGoal = async (goal) => {
+    const db = getFirestore();
+    const goalRef = doc(db, 'goals', goal.id);
+    const completedRef = doc(db, 'completedGoals', goal.id);
+
+    try {
+      const docSnap = await getDoc(goalRef);
+      if (docSnap.exists()) {
+        await updateDoc(goalRef, { completed: false });
+      } else {
+        await setDoc(goalRef, { ...goal, completed: false });
+      }
+
+      await deleteDoc(completedRef);
+      setCompletedGoals(prev => prev.filter(g => g.id !== goal.id));
+    } catch (err) {
+      console.warn('⚠️ Failed to reopen goal:', err);
+    }
+  };
+
   // Count completed goals that have a saved reflection
   const goalsWithReflections = completedGoals.filter(goal => !!goal.reflection).length;
 
@@ -66,6 +86,7 @@ const ReflectionScreen = () => {
                   onChangeText={(text) => setReflections(prev => ({ ...prev, [item.id]: text }))}
                 />
                 <Button title="Save Reflection" onPress={() => handleSaveReflection(item.id)} />
+                <Button title="Reopen Goal" onPress={() => handleReopenGoal(item)} />
                 {item.completedSteps && item.completedSteps.length > 0 && (
                   <View style={styles.stepContainer}>
                     <Text style={styles.stepHeader}>✅ Steps Completed:</Text>

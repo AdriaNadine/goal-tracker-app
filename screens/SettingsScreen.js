@@ -5,6 +5,9 @@ import { View, Text as RNText, Button, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { getAuth, signOut } from 'firebase/auth';
+import { getAuth as getAuthFirestore } from 'firebase/auth';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { useXP } from '../context/XPContext';
 
 const SettingsScreen = ({ navigation }) => {
   const navigationHook = useNavigation();
@@ -54,6 +57,24 @@ const SettingsScreen = ({ navigation }) => {
     Alert.alert("Reminder Set", "Daily reminder scheduled for 9:00 AM.");
   };
 
+  const { currentXP, level } = useXP();
+
+  const handleManualXPSync = async () => {
+    try {
+      const db = getFirestore();
+      const user = getAuth().currentUser;
+      if (user) {
+        await setDoc(doc(db, 'users', user.uid), {
+          xp: currentXP,
+          level: level
+        }, { merge: true });
+        Alert.alert("XP Synced", `XP (${currentXP}) and level (${level}) saved to Firestore.`);
+      }
+    } catch (err) {
+      Alert.alert("Sync Failed", "Could not sync XP to Firestore.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={{ paddingBottom: 10 }}>
@@ -67,6 +88,8 @@ const SettingsScreen = ({ navigation }) => {
         <Button title="Reset All Progress" color="#cc0000" onPress={handleResetProgress} />
         <View style={{ height: 10 }} />
         <Button title="Logout" onPress={handleLogout} />
+        <View style={{ height: 10 }} />
+        <Button title="Sync XP to Cloud" onPress={handleManualXPSync} />
       </View>
     </View>
   );

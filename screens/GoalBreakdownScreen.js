@@ -115,15 +115,21 @@ const GoalBreakdownScreen = () => {
       fetchSteps();
       await awardXP(10);
 
-      if (stepReminderTime) {
-        await scheduleNotification(
-          {
-            id: editingStepId || `step-${new Date().getTime()}`,
-            text: stepText,
-          },
-          new Date(stepReminderTime)
-        );
+      if (stepReminderTime && typeof scheduleNotification === 'function') {
+        try {
+          await scheduleNotification(
+            {
+              id: editingStepId || `step-${new Date().getTime()}`,
+              text: stepText,
+            },
+            new Date(stepReminderTime)
+          );
+        } catch (err) {
+          console.warn('⚠️ scheduleNotification failed:', err);
+        }
         setStepReminderTime('');
+      } else if (stepReminderTime) {
+        console.warn('⚠️ scheduleNotification is not a function or time missing');
       }
     } catch (error) {
       console.error('Error saving step:', error);

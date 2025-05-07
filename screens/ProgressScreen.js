@@ -32,7 +32,9 @@ const ProgressScreen = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      setGoals(userGoals);
+      // Only include goals that are not completed (completed !== true)
+      const filteredGoals = userGoals.filter(goal => goal.completed !== true);
+      setGoals(filteredGoals);
 
       const stepsQuery = query(
         collection(db, 'steps'),
@@ -111,19 +113,27 @@ const ProgressScreen = () => {
                 text: "Yes",
                 onPress: async () => {
                   try {
-                    const goalDoc = goals.find(g => g.id === goalId);
-                    if (goalDoc) {
+                    // Fetch the full goal document from Firestore before writing to completedGoals
+                    const goalRef = doc(db, 'goals', goalId);
+                    const goalSnapshot = await getDoc(goalRef);
+                    if (goalSnapshot.exists()) {
+                      const goalDoc = { id: goalSnapshot.id, ...goalSnapshot.data() };
                       // Fetch all steps for this goal
                       const stepsSnapshot = await getDocs(
                         query(collection(db, 'steps'), where('goalId', '==', goalId))
                       );
                       const completedSteps = stepsSnapshot.docs.map(doc => doc.data());
 
+                      await updateDoc(goalRef, { completed: true });
+
                       await setDoc(doc(db, 'completedGoals', goalId), {
                         ...goalDoc,
                         completedSteps,
                         completedAt: new Date().toISOString(),
-                        userId: auth.currentUser.uid
+                        userId: auth.currentUser.uid,
+                        answers: goalDoc.answers || {},
+                        categoryName: goalDoc.categoryName || '',
+                        categoryColor: goalDoc.categoryColor || '',
                       });
                       console.log("✅ Moved to completedGoals");
 
