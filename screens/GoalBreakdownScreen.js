@@ -81,7 +81,7 @@ const GoalBreakdownScreen = () => {
       return;
     }
   
-    if (!isPremium && steps.length >= 5) {
+    if (steps.length >= 5 && !isPremium) {
       Alert.alert('Upgrade Required', 'Free users can only add up to 5 steps per goal. Upgrade to Premium for unlimited steps.');
       return;
     }

@@ -8,9 +8,9 @@ export default {
         resizeMode: "contain",
         backgroundColor: "#ffffff"
       },
-    version: "4.0.1",
+    version: "5.0.1",
     ios: {
-      buildNumber: "33",
+      buildNumber: "1",
       bundleIdentifier: 'com.adriaross.goaltracker',
       googleServicesFile: './assets/ios/GoogleService-Info.plist',
       infoPlist: {

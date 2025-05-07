@@ -8,12 +8,22 @@ import usePremiumStatus from '../hooks/usePremiumStatus';
 import SignInScreen from './SignInScreen';
 import { Ionicons } from '@expo/vector-icons';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+// If you have a resetXPContext in your XPContext.js, import it here:
+// import { resetXPContext } from '../context/XPContext';
+
 const motivationalQuotes = [
   "Small steps every day lead to big results.",
   "The body achieves what the mind believes.",
   "Success is the sum of small efforts, repeated day in and day out.",
   "You don’t have to be great to start, but you have to start to be great.",
   "The future belongs to those who believe in the beauty of their dreams.",
+  "Discipline is doing what needs to be done, even when you don’t feel like doing it.",
+  "Every accomplishment starts with the decision to try.",
+  "Don’t watch the clock; do what it does. Keep going.",
+  "Great things are not done by impulse, but by a series of small things brought together.",
+  "Progress, not perfection.",
+  "How do you eat an elephant? One bite at a time."
 ];
 
 const DashboardScreen = () => {
@@ -23,6 +33,15 @@ const DashboardScreen = () => {
   const [steps, setSteps] = useState([]);
   const [quote, setQuote] = useState('');
   const [isPremium] = usePremiumStatus();
+
+  const [collapsedCategories, setCollapsedCategories] = useState({});
+
+  const toggleCollapse = (category) => {
+    setCollapsedCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
+  };
 
   const fetchData = async () => {
     if (auth.currentUser) {
@@ -79,9 +98,19 @@ const DashboardScreen = () => {
     try {
       await signOut(auth);
       console.log("✅ User successfully signed out.");
+
+      // Clear local states
       setUserEmail('');
       setGoals([]);
       setSteps([]);
+
+      // Clear local storage if any cached XP or goals exist
+      await AsyncStorage.clear();
+
+      // Optional: Clear any global XP context or reflections if needed
+      // Uncomment if your XPContext exports a reset function:
+      // if (typeof resetXPContext === 'function') resetXPContext();
+
       if (navigation && navigation.navigate) {
         navigation.navigate('Welcome');
       }
@@ -218,25 +247,53 @@ const DashboardScreen = () => {
                 <Ionicons name="settings-outline" size={24} color="#007AFF" />
               </TouchableOpacity>
             </View>
-            <Text style={styles.quote} allowFontScaling={true}>{`Today’s Motivation: "${quote}"`}</Text>
+            <View style={styles.motivationContainer}>
+              <Text style={styles.quoteLabel} allowFontScaling={true}>Motivation</Text>
+              <Text style={styles.quote} allowFontScaling={true}>{`"${quote}"`}</Text>
+            </View>
             <Text style={styles.userInfo} allowFontScaling={true}>Welcome, {userEmail}!</Text>
-            <Text style={styles.sectionTitle} allowFontScaling={true}>Your Categories</Text>
+            <Text style={styles.sectionTitle} allowFontScaling={true}>Your Categories & Goals</Text>
           </>
         }
-        data={getCategorySummary()}
-        keyExtractor={(item) => item.name}
-        renderItem={renderCategoryItem}
-        ListEmptyComponent={<Text style={styles.emptyText} allowFontScaling={true}>No goals yet. Start by setting a goal!</Text>}
+        data={[]}
+        renderItem={null}
+        ListEmptyComponent={null}
         ListFooterComponent={
           <>
-            <Text style={styles.sectionTitle} allowFontScaling={true}>Your Goals</Text>
-            <FlatList
-              data={goals}
-              keyExtractor={(item) => item.id}
-              renderItem={renderGoalItem}
-              ListEmptyComponent={<Text style={styles.emptyText} allowFontScaling={true}>No goals yet.</Text>}
-              scrollEnabled={false}
-            />
+            {getCategorySummary().map((category) => {
+              const categoryGoals = goals.filter(g => g.categoryName === category.name);
+
+              return (
+                <View key={category.name} style={styles.categoryItem}>
+                  <TouchableOpacity onPress={() => toggleCollapse(category.name)}>
+                    <Text style={[styles.categoryText, { color: category.color }]}>
+                      {category.name}
+                    </Text>
+                    <Text style={styles.categoryDetail}>
+                      {`${category.goals} Goal${category.goals !== 1 ? 's' : ''}, ${category.progress}% Complete`}
+                    </Text>
+                  </TouchableOpacity>
+
+                  {!collapsedCategories[category.name] && categoryGoals.map(goal => (
+                    <View key={goal.id} style={[styles.goalItem, { borderColor: goal.categoryColor }]}>
+                      <Text style={[styles.goalText, { color: goal.categoryColor }]}>
+                        Goal: {goal.answers.what || 'No goal'}
+                      </Text>
+                      <Text style={styles.goalDetail}>Why: {goal.answers.why || 'No reason'}</Text>
+                      <Text style={styles.goalDetail}>Category: {goal.categoryName}</Text>
+                      <View style={styles.goalActions}>
+                        <TouchableOpacity style={styles.editButton} onPress={() => handleEditGoal(goal)}>
+                          <Text style={styles.editButtonText}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteGoal(goal.id)}>
+                          <Text style={styles.deleteButtonText}>Delete</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              );
+            })}
             {!isPremium && (
               <>
                 {(getCategorySummary().length >= 1 || goals.length >= 3 || steps.length >= 5) && (
@@ -296,22 +353,33 @@ const styles = StyleSheet.create({
     color: '#007AFF',
   },
   quote: {
-    fontSize: 20,
-    fontStyle: 'italic',
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#007AAA',
-    backgroundColor: '#E6F0FF',
-    borderRadius: 10,
-    padding: 20,
-    marginVertical: 10,
+    fontStyle: 'italic',
+    color: '#2E8B57', // SeaGreen
+    backgroundColor: '#E6F4EA', // soft green background
+    borderRadius: 12,
+    paddingVertical: 25,
+    paddingHorizontal: 20,
+    marginVertical: 20,
     textAlign: 'center',
-    borderWidth: 1,
-    borderColor: '#007AFF',
+    borderWidth: 2,
+    borderColor: '#2E8B57',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  quoteLabel: {
+    fontSize: 18,
+    color: '#228B22', // ForestGreen
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 2, // reduced from 5 to 2
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   userInfo: {
     fontSize: 15,
@@ -329,11 +397,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   categoryItem: {
-    padding: 5,
+    padding: 10,
     borderWidth: 2,
     borderRadius: 15,
     marginBottom: 10,
     backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   categoryText: {
     fontSize: 18,
@@ -359,11 +432,16 @@ const styles = StyleSheet.create({
     flex: 0.5,
   },
   goalItem: {
-    padding: 10,
-    borderWidth: 5,
-    borderRadius: 5,
-    marginBottom: 10,
+    padding: 12,
+    borderWidth: 2,
+    borderRadius: 10,
+    marginBottom: 12,
     backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   goalText: {
     fontSize: 16,
@@ -401,9 +479,10 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    color: '#888',
     textAlign: 'center',
-    marginTop: 20,
+    marginVertical: 20,
+    fontStyle: 'italic',
   },
   button: {
     backgroundColor: '#007AFF',
@@ -446,6 +525,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  motivationContainer: {
+    backgroundColor: '#f0fdf4',
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginVertical: 10,
+    borderWidth: 2,
+    borderColor: '#b6e0c2',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 2,
   },
 });
 

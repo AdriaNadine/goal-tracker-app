@@ -1,0 +1,7 @@
+[ ] Add light/dark mode support using useColorScheme and a shared theme.js for styling
+
+[ ] BACKUP: Add "Backup All Data" button in Settings to sync goals, steps, reflections to Firestore
+[ ] OFFLINE UX: Add banner or indicator when user is offline ("⚠️ You're offline — data will sync when back online.")
+[ ] UI POLISH: Improve dashboard appearance — rounded corners, category color dots, elevation/shadow, empty state text
+[ ] DRAFT REFLECTIONS: Auto-save in-progress reflection text to AsyncStorage in case of app close
+[ ] LOGOUT CLEANUP: Ensure logout clears XP, goals, reflections, and user state from memory and storage

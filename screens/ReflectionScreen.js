@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TextInput, Button, StyleSheet } from 'react-native';
 import { getFirestore, collection, getDocs, doc, updateDoc, query, where, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ReflectionScreen = () => {
   const [completedGoals, setCompletedGoals] = useState([]);
@@ -18,6 +19,12 @@ const ReflectionScreen = () => {
       const snapshot = await getDocs(q);
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setCompletedGoals(data);
+
+      // Load saved reflection drafts
+      const drafts = await AsyncStorage.getItem('reflectionDrafts');
+      if (drafts) {
+        setReflections(JSON.parse(drafts));
+      }
     };
 
     fetchCompletedGoals();
@@ -29,6 +36,8 @@ const ReflectionScreen = () => {
     const reflection = reflections[goalId];
 
     await updateDoc(goalRef, { reflection });
+    const updatedDrafts = { ...reflections, [goalId]: '' };
+    await AsyncStorage.setItem('reflectionDrafts', JSON.stringify(updatedDrafts));
     setReflections(prev => ({ ...prev, [goalId]: '' }));
     alert('Reflection saved!');
   };
@@ -83,7 +92,11 @@ const ReflectionScreen = () => {
                   style={styles.input}
                   placeholder="Write a reflection..."
                   value={reflections[item.id] || ''}
-                  onChangeText={(text) => setReflections(prev => ({ ...prev, [item.id]: text }))}
+                  onChangeText={async (text) => {
+                    const updated = { ...reflections, [item.id]: text };
+                    setReflections(updated);
+                    await AsyncStorage.setItem('reflectionDrafts', JSON.stringify(updated));
+                  }}
                 />
                 <Button title="Save Reflection" onPress={() => handleSaveReflection(item.id)} />
                 <Button title="Reopen Goal" onPress={() => handleReopenGoal(item)} />
