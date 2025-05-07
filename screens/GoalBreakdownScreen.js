@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert, TextInput } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, writeBatch, setDoc } from 'firebase/firestore';
 import usePremiumStatusHook from '../hooks/usePremiumStatus';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as Haptics from 'expo-haptics';
@@ -103,6 +103,7 @@ const GoalBreakdownScreen = () => {
       if (editingStepId) {
         const stepRef = doc(db, 'steps', editingStepId);
         await updateDoc(stepRef, stepData);
+        await setDoc(doc(db, 'steps', editingStepId), stepData, { merge: true });
         setEditingStepId(null);
       } else {
         await addDoc(collection(db, 'steps'), stepData);
@@ -171,6 +172,9 @@ const GoalBreakdownScreen = () => {
       }
       await batch.commit();
       setSteps(newSteps);
+      for (const step of newSteps) {
+        await setDoc(doc(db, 'steps', step.id), step, { merge: true });
+      }
     } catch (error) {
       console.error('Error updating step order:', error);
       Alert.alert('Error', 'Failed to reorder steps.');

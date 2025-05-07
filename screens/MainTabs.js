@@ -9,10 +9,13 @@ import PremiumScreen from './PremiumScreen';
 import XPStatusScreen from './XPStatusScreen';
 import ReflectionScreen from './ReflectionScreen';
 import { View, Text } from 'react-native';
+import { useXP } from '../contexts/XPContext';
 
 const Tab = createBottomTabNavigator();
 
 function MainTabs() {
+  const { isPremium } = useXP();
+
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen

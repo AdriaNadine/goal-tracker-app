@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Share, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Share, Alert, RefreshControl } from 'react-native';
 import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
 import { collection, query, where, getDocs, doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
@@ -14,7 +14,13 @@ const ProgressScreen = () => {
   const [sortType, setSortType] = useState('default');
   const [error, setError] = useState(null);
   const [currentXP, setCurrentXP] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
   const { awardXP } = useXP();
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  };
 
   const fetchData = async () => {
     if (!auth.currentUser) {
@@ -55,6 +61,24 @@ const ProgressScreen = () => {
   useEffect(() => {
     fetchData();
   }, [navigation]);
+
+  // Sync goals and steps to Firestore when they change
+  useEffect(() => {
+    const syncProgress = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      for (const goal of goals) {
+        await setDoc(doc(db, 'goals', goal.id), goal, { merge: true });
+      }
+
+      for (const step of steps) {
+        await setDoc(doc(db, 'steps', step.id), step, { merge: true });
+      }
+    };
+
+    syncProgress();
+  }, [goals, steps]);
   
   useEffect(() => {
     const loadXP = async () => {
@@ -286,7 +310,14 @@ const ProgressScreen = () => {
         data={getCombinedData()}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        ListEmptyComponent={<Text allowFontScaling={true} style={styles.emptyText}>No goals or steps yet.</Text>}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+        ListEmptyComponent={
+          <Text allowFontScaling={true} style={styles.emptyText}>
+            No goals or steps yet.
+          </Text>
+        }
       />
       <TouchableOpacity
         style={styles.navButton}

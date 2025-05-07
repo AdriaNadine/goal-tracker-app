@@ -59,19 +59,45 @@ const SettingsScreen = ({ navigation }) => {
 
   const { currentXP, level } = useXP();
 
-  const handleManualXPSync = async () => {
+  const handleManualFullSync = async () => {
     try {
       const db = getFirestore();
       const user = getAuth().currentUser;
-      if (user) {
-        await setDoc(doc(db, 'users', user.uid), {
-          xp: currentXP,
-          level: level
-        }, { merge: true });
-        Alert.alert("XP Synced", `XP (${currentXP}) and level (${level}) saved to Firestore.`);
+      if (!user) return;
+
+      // Sync XP & level
+      await setDoc(doc(db, 'users', user.uid), {
+        xp: currentXP,
+        level: level
+      }, { merge: true });
+
+      // Sync goals
+      const goals = await AsyncStorage.getItem('goals');
+      if (goals) {
+        for (const goal of JSON.parse(goals)) {
+          await setDoc(doc(db, 'goals', goal.id), goal, { merge: true });
+        }
       }
+
+      // Sync steps
+      const steps = await AsyncStorage.getItem('steps');
+      if (steps) {
+        for (const step of JSON.parse(steps)) {
+          await setDoc(doc(db, 'steps', step.id), step, { merge: true });
+        }
+      }
+
+      // Sync completed goals
+      const completed = await AsyncStorage.getItem('completedGoals');
+      if (completed) {
+        for (const goal of JSON.parse(completed)) {
+          await setDoc(doc(db, 'completedGoals', goal.id), goal, { merge: true });
+        }
+      }
+
+      Alert.alert("✅ Synced", "All data synced to Firestore.");
     } catch (err) {
-      Alert.alert("Sync Failed", "Could not sync XP to Firestore.");
+      Alert.alert("Sync Failed", "Could not sync everything to Firestore.");
     }
   };
 
@@ -89,7 +115,7 @@ const SettingsScreen = ({ navigation }) => {
         <View style={{ height: 10 }} />
         <Button title="Logout" onPress={handleLogout} />
         <View style={{ height: 10 }} />
-        <Button title="Sync XP to Cloud" onPress={handleManualXPSync} />
+        <Button title="Backup All Data" onPress={handleManualFullSync} />
       </View>
     </View>
   );

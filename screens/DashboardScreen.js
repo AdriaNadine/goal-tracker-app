@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, RefreshControl } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { auth, db } from '../config/firebase';
 import { signOut } from 'firebase/auth';
-import { collection, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, deleteDoc, setDoc } from 'firebase/firestore';
 import usePremiumStatus from '../hooks/usePremiumStatus';
 import SignInScreen from './SignInScreen';
 import { Ionicons } from '@expo/vector-icons';
@@ -35,6 +35,12 @@ const DashboardScreen = () => {
   const [isPremium] = usePremiumStatus();
 
   const [collapsedCategories, setCollapsedCategories] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  };
 
   const toggleCollapse = (category) => {
     setCollapsedCategories((prev) => ({
@@ -93,6 +99,25 @@ const DashboardScreen = () => {
       setQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
     }, [])
   );
+
+  // Sync goals and steps to Firestore whenever they change
+  useEffect(() => {
+    const syncGoalsAndSteps = async () => {
+      if (!auth.currentUser) return;
+
+      const uid = auth.currentUser.uid;
+
+      for (const goal of goals) {
+        await setDoc(doc(db, 'goals', goal.id), goal, { merge: true });
+      }
+
+      for (const step of steps) {
+        await setDoc(doc(db, 'steps', step.id), step, { merge: true });
+      }
+    };
+
+    syncGoalsAndSteps();
+  }, [goals, steps]);
 
   const handleLogout = async () => {
     try {
@@ -320,6 +345,9 @@ const DashboardScreen = () => {
               <Text style={styles.logoutText} allowFontScaling={true}>Logout</Text>
             </TouchableOpacity>
           </>
+        }
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       />
     </View>

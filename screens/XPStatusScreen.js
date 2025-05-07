@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, TextInput, Button, StyleSheet, Alert, SafeAreaView, Image, Animated, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, SafeAreaView, Image, Animated, ScrollView, RefreshControl } from 'react-native';
 import usePremiumStatusHook from '../hooks/usePremiumStatus';
 import { useXP } from '../context/XPContext';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
@@ -35,6 +35,7 @@ const XPStatusScreen = () => {
   // Ref to track last level for celebratory alert
   const lastLevelRef = useRef(0);
   const [showBadge, setShowBadge] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Sparkle animation refs
   const sparkleOpacity = useRef(new Animated.Value(0)).current;
@@ -95,6 +96,19 @@ const XPStatusScreen = () => {
     loadCustomRewards();
   }, []);
 
+  useEffect(() => {
+    const syncRewards = async () => {
+      const user = getAuth().currentUser;
+      if (!user) return;
+      const db = getFirestore();
+      await setDoc(doc(db, 'users', user.uid), { customRewards }, { merge: true });
+    };
+
+    if (Object.keys(customRewards).length > 0) {
+      syncRewards();
+    }
+  }, [customRewards]);
+
   const handleSaveReward = async () => {
     setSavedReward(reward);
     const lvl = parseInt(targetLevel);
@@ -133,6 +147,29 @@ const XPStatusScreen = () => {
     }
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const saved = await AsyncStorage.getItem('customRewards');
+      if (saved) {
+        setCustomRewards(JSON.parse(saved));
+      }
+      const user = getAuth().currentUser;
+      if (user) {
+        const db = getFirestore();
+        const docRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data().customRewards) {
+          setCustomRewards(prev => ({ ...prev, ...docSnap.data().customRewards }));
+        }
+      }
+    } catch (err) {
+      console.warn('⚠️ Error refreshing XP and rewards:', err);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <>
       {(typeof isPremium === 'undefined' || typeof currentXP !== 'number') && (
@@ -149,7 +186,12 @@ const XPStatusScreen = () => {
 
       {isPremium && typeof currentXP === 'number' && (
         <SafeAreaView style={styles.container}>
-          <ScrollView contentContainerStyle={styles.scrollContent}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+            }
+          >
             <Text style={styles.header}>XP Status</Text>
             <Text style={styles.status}>Current XP: {currentXP}</Text>
             <Text style={styles.status}>Level: {level}</Text>

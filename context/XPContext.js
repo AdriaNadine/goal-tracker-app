@@ -86,6 +86,25 @@ export const XPProvider = ({ children }) => {
     });
   };
 
+  useEffect(() => {
+    const syncXP = async () => {
+      const db = getFirestore();
+      const user = getAuth().currentUser;
+      if (user) {
+        try {
+          await setDoc(doc(db, 'users', user.uid), {
+            xp: currentXP,
+            level: level,
+          }, { merge: true });
+        } catch (err) {
+          console.warn('⚠️ Failed to sync XP:', err);
+        }
+      }
+    };
+
+    syncXP();
+  }, [currentXP, level]);
+
   return (
     <XPContext.Provider value={{ currentXP, setCurrentXP, level, awardXP }}>
       {children}
